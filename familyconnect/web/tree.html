@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FamilyConnect – Cây gia phả</title>
+<link rel="stylesheet" href="css/base.css">
+</head>
+<body data-page="tree">
+<div class="app">
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main">
+<div class="page-head"><h1>Cây gia phả</h1><button type="button" class="btn">Thêm thành viên</button></div>
+<div class="toolbar">
+  <div><label for="family">Dòng họ</label><select id="family"><option>Dòng họ Nguyễn</option></select></div>
+  <div><label for="branch">Nhánh họ</label><select id="branch"><option>Tất cả nhánh</option><option>Nhánh trưởng</option><option>Nhánh thứ</option></select></div>
+  <div><label for="q">Tìm thành viên</label><input id="q" type="search" placeholder="Nhập tên..."></div>
+  <div class="row"><button type="button" class="btn secondary small">Thu nhỏ</button><button type="button" class="btn secondary small">Phóng to</button></div>
+</div>
+<div class="split">
+  <section class="card tree">
+    <ul><li>
+      <span class="node male">Nguyễn Văn An<small>1930 – 2010 · Thế hệ 1</small>Vợ: Lê Thị Hoa</span>
+      <ul>
+        <li><span class="node male selected">Nguyễn Văn Bình<small>1958 · Thế hệ 2</small>Vợ: Trần Thị Mai</span>
+          <ul>
+            <li><span class="node male">Nguyễn Minh Khang<small>1985 · Thế hệ 3</small></span></li>
+            <li><span class="node female">Nguyễn Thu Hà<small>1989 · Thế hệ 3</small></span></li>
+          </ul></li>
+        <li><span class="node female">Nguyễn Thị Cúc<small>1962 · Thế hệ 2</small><span class="badge warn" data-enum-label="RelationshipTypes" data-value="ADOPTED">Con nuôi</span></span>
+          <ul><li><span class="node male">Lê Gia Phúc<small>1990 · Thế hệ 3</small></span></li></ul></li>
+      </ul>
+    </li></ul>
+    <p class="muted">Viền xanh: nam · viền hồng: nữ · nhãn Con nuôi: quan hệ con nuôi (mặc định là con ruột).</p>
+  </section>
+  <aside>
+    <section class="card"><h2>Nguyễn Văn Bình</h2>
+      <ul class="list"><li>Giới tính: <span data-enum-label="Gender" data-value="MALE">Nam</span></li><li>Ngày sinh: 12/03/1958</li><li>Thế hệ: 2 · Nhánh trưởng</li><li>Nghề nghiệp: Giáo viên</li><li>Xác minh: <span class="badge ok">Đã xác minh</span></li></ul>
+    </section>
+    <section class="card"><h2>Trợ lý AI</h2>
+      <label for="ai-q">Hỏi về quan hệ</label>
+      <input id="ai-q" placeholder="Khang là gì của Cúc?">
+      <p class="row"><button type="button" class="btn small">Giải thích</button></p>
+    </section>
+  </aside>
+</div>
+</main>
+</div>
+<script src="src/components/Layout.js"></script>
+<script type="module" src="src/components/EnumBinder.js"></script>
+</body>
+</html>

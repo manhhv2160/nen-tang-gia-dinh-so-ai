@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FamilyConnect – Sự kiện</title>
+<link rel="stylesheet" href="css/base.css">
+</head>
+<body data-page="events">
+<div class="app">
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main">
+<div class="page-head"><h1>Sự kiện dòng họ</h1></div>
+<details class="card"><summary>Tạo sự kiện mới</summary>
+  <div class="form-grid">
+    <div><label for="ev-title">Tên sự kiện</label><input id="ev-title"></div>
+    <div><label for="ev-loc">Địa điểm</label><input id="ev-loc"></div>
+    <div><label for="ev-start">Bắt đầu</label><input id="ev-start" type="datetime-local"></div>
+    <div><label for="ev-end">Kết thúc</label><input id="ev-end" type="datetime-local"></div>
+  </div>
+  <label for="ev-desc">Mô tả</label><textarea id="ev-desc" rows="3"></textarea>
+  <p><button type="button" class="btn">Tạo sự kiện</button></p>
+</details>
+
+<section class="grid">
+  <article class="card"><h2>Giỗ tổ dòng họ</h2>
+    <ul class="list"><li>Bắt đầu: 20/11/2026 08:00</li><li>Kết thúc: 20/11/2026 14:00</li><li>Địa điểm: Nhà thờ họ, Long An</li></ul>
+    <p class="muted"><span data-enum-label="RsvpStatus" data-value="ATTENDING">Sẽ tham dự</span> 42 · <span data-enum-label="RsvpStatus" data-value="MAYBE">Có thể</span> 9 · <span data-enum-label="RsvpStatus" data-value="DECLINED">Từ chối</span> 3</p>
+    <div class="row" data-enum-buttons="RsvpStatus"></div>
+  </article>
+  <article class="card"><h2>Họp mặt cuối năm</h2>
+    <ul class="list"><li>Bắt đầu: 27/12/2026 18:00</li><li>Kết thúc: 27/12/2026 21:30</li><li>Địa điểm: Nhà hàng Sen Việt, TP. Hồ Chí Minh</li></ul>
+    <p class="muted"><span data-enum-label="RsvpStatus" data-value="ATTENDING">Sẽ tham dự</span> 18 · <span data-enum-label="RsvpStatus" data-value="MAYBE">Có thể</span> 12 · <span data-enum-label="RsvpStatus" data-value="DECLINED">Từ chối</span> 1</p>
+    <div class="row" data-enum-buttons="RsvpStatus"></div>
+  </article>
+</section>
+
+<section class="card"><h2>Người tham gia: Giỗ tổ dòng họ</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Thành viên</th><th>Trạng thái</th><th>Thời điểm phản hồi</th></tr></thead>
+    <tbody>
+      <tr><td>Trần Thị Mai</td><td><span class="badge ok" data-enum-label="RsvpStatus" data-value="ATTENDING">Sẽ tham dự</span></td><td>17/10/2026 20:40</td></tr>
+      <tr><td>Nguyễn Minh Khang</td><td><span class="badge warn" data-enum-label="RsvpStatus" data-value="MAYBE">Có thể</span></td><td>17/10/2026 21:10</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</main>
+</div>
+<script src="src/components/Layout.js"></script>
+<script type="module" src="src/components/EnumBinder.js"></script>
+</body>
+</html>

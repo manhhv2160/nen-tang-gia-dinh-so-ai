@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FamilyConnect – Tổng quan</title>
+<link rel="stylesheet" href="css/base.css">
+</head>
+<body data-page="dashboard">
+<div class="app">
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main">
+<div class="page-head"><h1>Tổng quan</h1><button type="button" class="btn secondary">Xuất báo cáo</button></div>
+<section class="grid">
+  <div class="card stat"><b>128</b><span>Tài khoản</span></div>
+  <div class="card stat"><b>342</b><span>Thành viên trong gia phả</span></div>
+  <div class="card stat"><b>6</b><span>Số thế hệ</span></div>
+  <div class="card stat"><b>87</b><span>Bài đăng</span></div>
+  <div class="card stat"><b>12</b><span>Sự kiện</span></div>
+  <div class="card stat"><b>45</b><span>Tài liệu di sản</span></div>
+</section>
+<section class="grid">
+  <div class="card"><h2>Phân bố giới tính</h2>
+    <span class="muted"><span data-enum-label="Gender" data-value="MALE">Nam</span> · 55%</span><div class="bar"><i class="w55"></i></div>
+    <span class="muted"><span data-enum-label="Gender" data-value="FEMALE">Nữ</span> · 43%</span><div class="bar"><i class="w45"></i></div>
+    <span class="muted"><span data-enum-label="Gender" data-value="OTHER">Khác</span> · 2%</span><div class="bar"><i class="w10"></i></div>
+  </div>
+  <div class="card"><h2>Sự kiện sắp tới</h2>
+    <ul class="list"><li>Giỗ tổ dòng họ <span class="muted">· 20/11/2026</span></li><li>Họp mặt cuối năm <span class="muted">· 27/12/2026</span></li></ul>
+  </div>
+</section>
+<section class="card"><h2>Hoạt động gần đây</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Thời gian</th><th>Người dùng</th><th>Hoạt động</th></tr></thead>
+    <tbody>
+      <tr><td>18/10/2026 09:12</td><td>Nguyễn Văn Bình</td><td>Đăng bài mới (<span data-enum-label="PostTypes" data-value="NEWS">Tin tức</span>)</td></tr>
+      <tr><td>17/10/2026 20:40</td><td>Trần Thị Mai</td><td>Phản hồi sự kiện (<span data-enum-label="RsvpStatus" data-value="ATTENDING">Sẽ tham dự</span>)</td></tr>
+      <tr><td>17/10/2026 18:05</td><td>Nguyễn Thu Hà</td><td>Thêm tài liệu di sản (<span data-enum-label="HeritageTypes" data-value="STORY">Câu chuyện</span>)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</main>
+</div>
+<script src="src/components/Layout.js"></script>
+<script type="module" src="src/components/EnumBinder.js"></script>
+</body>
+</html>
