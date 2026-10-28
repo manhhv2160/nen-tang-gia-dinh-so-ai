@@ -1,0 +1,2 @@
+-- Schema của auth-service (database auth_db). Bảng: users.
+-- Khi viết: bắt đầu bằng \connect auth_db auth_svc ; ID dùng BIGINT, không có khóa ngoại sang bảng của service khác.

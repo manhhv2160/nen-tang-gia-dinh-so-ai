@@ -1,0 +1,2 @@
+-- Schema của genealogy-service (database genealogy_db). Bảng: family, branch, member, parent_child_relationship, marriage.
+-- Khi viết: bắt đầu bằng \connect genealogy_db genealogy_svc ; ID dùng BIGINT, không có khóa ngoại sang bảng của service khác.

@@ -1,0 +1,2 @@
+-- Schema của report-service (database report_db). Bảng: audit_log.
+-- Khi viết: bắt đầu bằng \connect report_db report_svc ; ID dùng BIGINT, không có khóa ngoại sang bảng của service khác.

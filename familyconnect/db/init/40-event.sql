@@ -1,0 +1,2 @@
+-- Schema của event-service (database event_db). Bảng: event, rsvp.
+-- Khi viết: bắt đầu bằng \connect event_db event_svc ; ID dùng BIGINT, không có khóa ngoại sang bảng của service khác.

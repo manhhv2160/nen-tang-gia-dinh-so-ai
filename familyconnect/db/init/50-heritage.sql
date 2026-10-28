@@ -1,0 +1,2 @@
+-- Schema của heritage-service (database heritage_db). Bảng: heritage.
+-- Khi viết: bắt đầu bằng \connect heritage_db heritage_svc ; ID dùng BIGINT, không có khóa ngoại sang bảng của service khác.
