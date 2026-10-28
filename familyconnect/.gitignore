@@ -1,0 +1,5 @@
+node_modules/
+.env
+pgdata/
+services/heritage-service/uploads/*
+!services/heritage-service/uploads/.gitkeep
