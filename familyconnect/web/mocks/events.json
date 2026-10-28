@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "status_code": 200,
+  "message": "OK",
+  "data": [
+    {
+      "event_id": "1",
+      "family_id": "1",
+      "user_id": "1",
+      "title": "Giỗ tổ dòng họ",
+      "description": null,
+      "location": "Nhà thờ họ, Long An",
+      "start_time": "2026-11-20T08:00:00.000Z",
+      "end_time": "2026-11-20T14:00:00.000Z",
+      "created_at": "2026-10-01T08:00:00.000Z",
+      "updated_at": "2026-10-01T08:00:00.000Z"
+    },
+    {
+      "event_id": "2",
+      "family_id": "1",
+      "user_id": "1",
+      "title": "Họp mặt cuối năm",
+      "description": null,
+      "location": "TP. Hồ Chí Minh",
+      "start_time": "2026-12-27T18:00:00.000Z",
+      "end_time": null,
+      "created_at": "2026-10-01T08:00:00.000Z",
+      "updated_at": "2026-10-01T08:00:00.000Z"
+    }
+  ]
+}
