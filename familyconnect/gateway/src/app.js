@@ -1,11 +1,21 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { verifyToken } from './middleware/auth.js';
 import { setupProxies } from './proxy/index.js';
+
+// Cấu hình đường dẫn tuyệt đối cho ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
 app.use(cors());
+
+// Phục vụ thư mục web (frontend) tĩnh
+app.use(express.static(path.join(__dirname, '../../web')));
+
 // KHÔNG dùng express.json() ở gateway: nó đọc mất body của POST nên request login/register sẽ bị treo
 
 // Xóa mọi header x-user-* do client gửi lên (chống giả danh)

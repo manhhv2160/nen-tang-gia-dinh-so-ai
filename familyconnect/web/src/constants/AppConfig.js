@@ -1,7 +1,7 @@
 // Cấu hình chung của frontend. Sửa ở đây, không rải địa chỉ API trong code.
 export const AppConfig = Object.freeze({
   // Địa chỉ gốc của API (gateway). Đường dẫn tương đối: cùng máy chủ với trang web.
-  API_BASE_URL: '/api/v1',
+    API_BASE_URL: 'http://localhost:8080/api/v1',
 
   // Quá thời gian này (ms) thì hủy yêu cầu.
   REQUEST_TIMEOUT_MS: 15000,
