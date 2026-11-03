@@ -1,8 +1,7 @@
-// Giới hạn số lần đăng nhập sai và số request theo IP
-import rateLimit from 'express-rate-limit';
+const rateLimit = require('express-rate-limit');
 
 // Giới hạn request chung (100 request / 15 phút)
-export const apiLimiter = rateLimit({
+const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
     max: 100, 
     handler: (req, res) => {
@@ -16,7 +15,7 @@ export const apiLimiter = rateLimit({
 });
 
 // Giới hạn đăng nhập sai (khóa 5 phút nếu sai 5 lần)
-export const loginLimiter = rateLimit({
+const loginLimiter = rateLimit({
     windowMs: 5 * 60 * 1000, 
     max: 5, 
     handler: (req, res) => {
@@ -28,3 +27,5 @@ export const loginLimiter = rateLimit({
         });
     }
 });
+
+module.exports = { apiLimiter, loginLimiter };

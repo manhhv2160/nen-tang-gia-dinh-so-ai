@@ -20,12 +20,41 @@ class User {
         return rows[0]; // Trả về thông tin user vừa tạo
     }
 
-    // Mới: lấy user theo id (không trả password_hash)
+    // Lấy user theo id (không trả password_hash)
     static async findById(userId) {
         const query = `
             SELECT user_id, email, full_name, role, created_at, updated_at
             FROM users WHERE user_id = $1;
         `;
+        const { rows } = await pool.query(query, [userId]);
+        return rows[0];
+    }
+
+    // Lấy danh sách tất cả user (không trả password_hash)
+    static async findAll() {
+        const query = `
+            SELECT user_id, email, full_name, role, created_at, updated_at
+            FROM users ORDER BY created_at DESC;
+        `;
+        const { rows } = await pool.query(query);
+        return rows;
+    }
+
+    // Cập nhật vai trò người dùng
+    static async updateRole(userId, role) {
+        const query = `
+            UPDATE users 
+            SET role = $1, updated_at = CURRENT_TIMESTAMP 
+            WHERE user_id = $2 
+            RETURNING user_id, email, full_name, role, updated_at;
+        `;
+        const { rows } = await pool.query(query, [role, userId]);
+        return rows[0];
+    }
+
+    // Xóa người dùng
+    static async delete(userId) {
+        const query = 'DELETE FROM users WHERE user_id = $1 RETURNING user_id;';
         const { rows } = await pool.query(query, [userId]);
         return rows[0];
     }

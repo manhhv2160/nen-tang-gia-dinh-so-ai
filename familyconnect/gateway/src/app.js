@@ -1,17 +1,23 @@
-import express from 'express';
-import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { verifyToken } from './middleware/auth.js';
-import { setupProxies } from './proxy/index.js';
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
 
-// Cấu hình đường dẫn tuyệt đối cho ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Import các module và middleware tự viết
+const { verifyToken } = require('./middleware/auth.js');
+const { setupProxies } = require('./proxy/index.js');
+const requestLogger = require('./middleware/requestLogger.js');
+const { apiLimiter } = require('./middleware/rateLimiter.js');
+const errorHandler = require('./middleware/errorHandler.js');
 
 const app = express();
 
 app.use(cors());
+
+// 1. Thêm requestLogger theo yêu cầu của Bảo
+app.use(requestLogger);
+
+// 2. Thêm giới hạn request chung (chống spam)
+app.use(apiLimiter);
 
 // Phục vụ thư mục web (frontend) tĩnh
 app.use(express.static(path.join(__dirname, '../../web')));
@@ -50,15 +56,7 @@ app.use(verifyToken);
 // Chuyển tiếp request đến đúng service
 setupProxies(app);
 
-// Xử lý lỗi
-app.use((err, req, res, next) => {
-    console.error('[Gateway Error]', err.stack);
-    res.status(500).json({
-        success: false,
-        status_code: 500,
-        message: 'Lỗi Gateway nội bộ',
-        data: null
-    });
-});
+// 3. Sử dụng file errorHandler.js đã tách riêng
+app.use(errorHandler);
 
-export default app;
+module.exports = app;

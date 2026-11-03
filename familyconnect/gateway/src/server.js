@@ -1,5 +1,5 @@
 // Khởi động gateway (cổng 8080)
-import app from './app.js';
+const app = require('./app.js');
 
 const PORT = process.env.PORT || 8080; 
 
