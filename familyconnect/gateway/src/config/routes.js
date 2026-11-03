@@ -26,3 +26,13 @@ export const ROUTES = [
     { prefix: '/api/v1/audit-logs', target: 'http://localhost:3007' },
     { prefix: '/api/v1/reports', target: 'http://localhost:3007' }
 ];
+
+export const HEALTH_ROUTES = [
+    { path: '/health/auth', target: process.env.AUTH_URL || 'http://localhost:3001' },
+    { path: '/health/genealogy', target: process.env.GENEALOGY_URL || 'http://localhost:3002' },
+    { path: '/health/community', target: process.env.COMMUNITY_URL || 'http://localhost:3003' },
+    { path: '/health/event', target: process.env.EVENT_URL || 'http://localhost:3004' },
+    { path: '/health/heritage', target: process.env.HERITAGE_URL || 'http://localhost:3005' },
+    { path: '/health/ai', target: process.env.AI_URL || 'http://localhost:3006' },
+    { path: '/health/report', target: process.env.REPORT_URL || 'http://localhost:3007' }
+];

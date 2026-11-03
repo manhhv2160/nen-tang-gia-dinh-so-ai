@@ -1,5 +1,5 @@
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { ROUTES } from '../config/routes.js';
+import { HEALTH_ROUTES, ROUTES } from '../config/routes.js';
 
 const onProxyError = (err, req, res) => {
     console.error('[Proxy Error]', err.message);
@@ -24,6 +24,18 @@ export const setupProxies = (app) => {
             pathRewrite: { '^/api/v1': '/api' },
             onError: onProxyError,       // http-proxy-middleware bản 2
             on: { error: onProxyError }  // http-proxy-middleware bản 3
+        }));
+    });
+};
+
+export const setupHealthProxies = (app) => {
+    HEALTH_ROUTES.forEach(route => {
+        app.get(route.path, createProxyMiddleware({
+            target: route.target,
+            changeOrigin: true,
+            pathRewrite: () => '/health',
+            onProxyError,
+            on: { error: onProxyError }
         }));
     });
 };

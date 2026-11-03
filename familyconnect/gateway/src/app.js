@@ -4,7 +4,7 @@ const path = require('path');
 
 // Import các module và middleware tự viết
 const { verifyToken } = require('./middleware/auth.js');
-const { setupProxies } = require('./proxy/index.js');
+const { setupProxies, setupHealthProxies } = require('./proxy/index.js');
 const requestLogger = require('./middleware/requestLogger.js');
 const { apiLimiter } = require('./middleware/rateLimiter.js');
 const errorHandler = require('./middleware/errorHandler.js');
@@ -49,6 +49,9 @@ app.use((req, res, next) => {
 
 // Kiểm tra sức khỏe Gateway
 app.get('/health', (req, res) => res.status(200).json({ status: 'Gateway is OK' }));
+
+// Chuyển tiếp health check tới từng service; các route này không yêu cầu JWT.
+setupHealthProxies(app);
 
 // Kiểm tra JWT
 app.use(verifyToken);
