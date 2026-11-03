@@ -7,7 +7,16 @@ app.use(cors());
 app.use(express.json());
 
 // API kiểm tra trạng thái sống của service
-app.get('/health', (req, res) => res.status(200).json({ status: 'Auth Service is OK' }));
+app.get('/health', (req, res) => res.status(200).json({
+    success: true,
+    status_code: 200,
+    message: 'OK',
+    data: {
+        service: 'auth-service',
+        status: 'UP',
+        time: new Date().toISOString()
+    }
+}));
 
 // 1. Khai báo route
 const authRoutes = require('./routes/auth.routes');

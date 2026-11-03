@@ -1,1 +1,7 @@
-// Khởi động ai-service (cổng 3006)
+import app from './app.js';
+
+const port = Number(process.env.PORT || 3006);
+
+app.listen(port, '0.0.0.0', () => {
+    console.log(`ai-service listening on port ${port}`);
+});
