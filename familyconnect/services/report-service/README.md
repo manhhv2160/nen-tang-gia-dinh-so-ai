@@ -10,18 +10,18 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 ## Endpoint công khai (qua gateway, tiền tố `/api/v1`)
 | Phương thức | Đường dẫn | Mô tả |
 |---|---|---|
-| GET | `/dashboard/stats` | Số liệu tổng hợp từ các service |
-| GET | `/dashboard/activity` | Hoạt động cộng đồng gần đây |
-| GET | `/audit-logs` | Nhật ký hệ thống (FAMILY_ADMIN trở lên) |
-| GET | `/reports/export?type=` | Xuất báo cáo |
+| GET | `/dashboard/stats?family_id=` | Số liệu tổng hợp theo dòng họ; SYSTEM_ADMIN có thể bỏ trống để lấy toàn hệ thống |
+| GET | `/dashboard/activity?family_id=` | Hoạt động gần đây của dòng họ |
+| GET | `/reports/family-summary?family_id=` | Báo cáo tổng hợp của dòng họ (quản trị dòng họ; frontend xuất CSV/PDF) |
+| GET | `/audit-logs` | Nhật ký hệ thống (SYSTEM_ADMIN; lọc theo người dùng, hành động, đối tượng và thời gian) |
 
 ## Endpoint nội bộ (`/internal`, gateway không công khai)
 | Phương thức | Đường dẫn | Mô tả |
 |---|---|---|
-| POST | `/internal/audit` | Các service gửi sự kiện nhật ký (không chờ phản hồi) |
+| POST | `/internal/audit` | Các service gửi sự kiện nhật ký; nhận 202, bên gọi không chờ kết quả |
 
 ## Gọi tới service khác
-- auth, genealogy, community, event, heritage (/internal/stats)
+- auth (danh sách người dùng và thống kê), genealogy (memberships, thống kê và hoạt động), community, event, heritage (thống kê và hoạt động)
 
 ## Danh sách việc
 - [ ] Model và bảng trong `db/init`

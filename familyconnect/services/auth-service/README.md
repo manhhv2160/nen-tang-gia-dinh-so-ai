@@ -13,19 +13,22 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 | POST | `/auth/register` | Đăng ký (vai trò mặc định GUEST) |
 | POST | `/auth/login` | Đăng nhập, trả JWT |
 | GET | `/auth/me` | Thông tin người dùng hiện tại |
-| GET | `/users` | Danh sách người dùng (FAMILY_ADMIN trở lên) |
-| GET | `/users/:id` | Chi tiết người dùng |
-| PATCH | `/users/:id` | Đổi vai trò/hồ sơ (SYSTEM_ADMIN) |
+| GET | `/users` | Danh sách người dùng (SYSTEM_ADMIN) |
+| GET | `/users/:id` | Chi tiết người dùng (chính người đó hoặc SYSTEM_ADMIN) |
+| PATCH | `/users/:id` | Sửa hồ sơ của chính mình; chỉ SYSTEM_ADMIN được đổi vai trò |
 | DELETE | `/users/:id` | Xóa người dùng (SYSTEM_ADMIN) |
+| GET | `/user-lookup?ids=` | Tra cứu họ tên theo danh sách ID (tối đa 50, cần đăng nhập) |
 
 ## Endpoint nội bộ (`/internal`, gateway không công khai)
 | Phương thức | Đường dẫn | Mô tả |
 |---|---|---|
 | GET | `/internal/users/:id` | Thông tin cơ bản của một người dùng |
+| GET | `/internal/users?ids=` | Tra cứu thông tin cơ bản theo danh sách ID (tối đa 100) |
+| PATCH | `/internal/users/:id/role` | Đổi vai trò; genealogy dùng để nâng GUEST thành FAMILY_MEMBER sau xác minh |
 | GET | `/internal/stats` | Số liệu cho dashboard |
 
 ## Gọi tới service khác
-- Không gọi service nào
+- report (ghi nhật ký đăng ký, đăng nhập, đổi vai trò và xóa người dùng)
 
 ## Danh sách việc
 - [ ] Model và bảng trong `db/init`

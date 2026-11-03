@@ -11,18 +11,21 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 ## Endpoint công khai (qua gateway, tiền tố `/api/v1`)
 | Phương thức | Đường dẫn | Mô tả |
 |---|---|---|
-| CRUD | `/events` | Sự kiện dòng họ (start_time, end_time) |
-| GET | `/events/upcoming` | Sự kiện sắp diễn ra / nhắc lịch |
-| CRUD | `/rsvps` | Phản hồi tham gia (ATTENDING | DECLINED | MAYBE) |
-| GET | `/events/:id/participants` | Danh sách người tham gia |
+| GET, POST | `/events?family_id=` | Liệt kê sự kiện theo dòng họ (lọc theo thời gian, upcoming, người tổ chức) hoặc tạo sự kiện |
+| GET, PATCH, DELETE | `/events/:id` | Xem sự kiện; người tổ chức sửa, người tạo xóa |
+| GET | `/rsvps?event_id=` | Danh sách phản hồi/người tham gia (lọc theo trạng thái) |
+| POST | `/rsvps` | Tạo hoặc cập nhật phản hồi (ATTENDING, DECLINED, MAYBE); mỗi người một phản hồi cho mỗi sự kiện |
+| DELETE | `/rsvps/:id` | Xóa phản hồi của chính người đã gửi |
 
 ## Endpoint nội bộ (`/internal`, gateway không công khai)
 | Phương thức | Đường dẫn | Mô tả |
 |---|---|---|
-| GET | `/internal/stats` | Số liệu cho dashboard |
+| GET | `/internal/stats?family_id=` | Số liệu cho dashboard (lọc dòng họ tùy chọn) |
+| GET | `/internal/activity?family_id=&limit=` | Hoạt động sự kiện gần đây của dòng họ |
 
 ## Gọi tới service khác
-- genealogy (kiểm tra người dùng thuộc family_id)
+- genealogy (kiểm tra người dùng thuộc dòng họ qua memberships)
+- report (ghi nhật ký các thao tác tạo, sửa, xóa)
 
 ## Danh sách việc
 - [ ] Model và bảng trong `db/init`
