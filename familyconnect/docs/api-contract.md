@@ -1,6 +1,6 @@
 # FamilyConnect – Hợp đồng API v1
 
-Trạng thái: bản đề xuất, chờ cả nhóm duyệt ở bước 0.5. Sau khi duyệt, muốn đổi endpoint phải báo người đang dùng và ghi vào mục "Lịch sử thay đổi" ở cuối.
+Sau khi duyệt, muốn đổi endpoint phải báo người đang dùng và ghi vào mục "Lịch sử thay đổi" ở cuối.
 
 Ký hiệu: dấu `*` sau tên trường nghĩa là bắt buộc. `id` là chuỗi số (BIGINT), `ts` là timestamp, `date` là ngày, dấu `?` nghĩa là có thể null.
 
@@ -305,20 +305,7 @@ Cây gia phả (`GET /tree?family_id=1`). Mỗi nút gồm `member_id`, `full_na
 
 Route công khai không cần token: `POST /auth/register`, `POST /auth/login`, `GET /health`. Mọi đường dẫn bắt đầu bằng `/internal` bị gateway trả 404.
 
-## 9. Khác biệt so với bản nháp trong bộ khung
-
-- `GET /members/search` đổi thành `GET /members?q=`.
-- `GET /relationships/query` đổi thành `GET /relation-query`, vì `query` sẽ bị hiểu nhầm là một `:id`.
-- `GET /events/upcoming` đổi thành `GET /events?upcoming=true`.
-- `GET /events/:id/participants` đổi thành `GET /rsvps?event_id=`.
-- `GET /reports/export` đổi thành `GET /reports/family-summary`; xuất CSV hoặc PDF làm ở frontend.
-- `GET /users` chỉ dành cho SYSTEM_ADMIN (bản nháp ghi FAMILY_ADMIN trở lên).
-- Bỏ `PATCH /rsvps/:id`; `POST /rsvps` làm luôn việc cập nhật.
-- Thêm: `GET /user-lookup`, `GET /files/:name`, `POST /members/:id/link-user`, `POST /members/:id/verify`, `GET /internal/activity`, `PATCH /internal/users/:id/role`.
-
-Sau khi nhóm duyệt, cập nhật bảng endpoint trong README của từng service cho khớp tài liệu này.
-
-## 10. Chưa nằm trong phạm vi v1, cần nhóm chốt
+## 9. Chưa nằm trong phạm vi
 
 - Quên mật khẩu, xác minh email, đổi mật khẩu: giao diện có liên kết "Quên mật khẩu?" nhưng chưa có endpoint.
 - Thư viện ảnh của sự kiện: `event` chưa có trường ảnh; đề xuất dùng `heritage` loại PHOTO.
