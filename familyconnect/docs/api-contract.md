@@ -152,17 +152,17 @@ Tên người dùng không nằm trong các đối tượng trên. Frontend gom 
 
 | Endpoint | Quyền | Đầu vào | Thành công | Lỗi |
 |---|---|---|---|---|
-| `GET /families` | Thành viên | Lọc `q` (tên chứa). Người thường chỉ thấy dòng họ mình thuộc | 200 `Family[]` | 401 |
+| `GET /families` | Thành viên | Lọc `q` (tên chứa), `limit` (mặc định 50, tối đa 100), `offset` (mặc định 0); sort `family_name` hoặc `-family_name` (mặc định tăng dần) | 200 `Family[]`; `X-Total-Count` | 400, 401 |
 | `GET /families/:id` | Thành viên | Không | 200 `Family` | 403, 404 |
 | `POST /families` | Quản trị hệ thống | Body: `family_name`*, `description`, `origin_place` | 201 `Family` | 400, 403 |
 | `PATCH /families/:id` | Quản trị dòng họ | `family_name`, `description`, `origin_place` | 200 `Family` | 400, 403, 404 |
 | `DELETE /families/:id` | Quản trị hệ thống | Không | 200 null | 403, 404 |
-| `GET /branches` | Thành viên | `family_id`*. Sort `branch_name` | 200 `Branch[]` | 400, 403 |
+| `GET /branches` | Thành viên | `family_id`*. `limit` (mặc định 50, tối đa 100), `offset` (mặc định 0). Sort `branch_name`, `-branch_name`; mặc định tăng dần | 200 `Branch[]`; `X-Total-Count` | 400, 403 |
 | `GET /branches/:id` | Thành viên | Không | 200 `Branch` | 403, 404 |
 | `POST /branches` | Quản trị dòng họ | `family_id`*, `branch_name`*, `description` | 201 `Branch` | 400, 403 |
 | `PATCH /branches/:id` | Quản trị dòng họ | `branch_name`, `description` | 200 `Branch` | 400, 403, 404 |
 | `DELETE /branches/:id` | Quản trị dòng họ | Không. Thành viên của nhánh được đặt `branch_id` là null | 200 null | 403, 404 |
-| `GET /members` | Thành viên | `family_id`*. Lọc `branch_id`, `generation`, `gender`, `is_verified`, `occupation` (chứa), `address` (chứa), `q` (họ tên chứa, không phân biệt hoa thường). Sort `full_name`, `generation`, `date_of_birth`; mặc định `generation` | 200 `Member[]` | 400, 403 |
+| `GET /members` | Thành viên | `family_id`*. Lọc `branch_id`, `generation`, `gender`, `is_verified`, `occupation` (chứa), `address` (chứa), `q` (họ tên chứa, không phân biệt hoa thường). `limit` (mặc định 50, tối đa 100), `offset` (mặc định 0). Sort `full_name`, `generation`, `date_of_birth` (thêm `-` để giảm dần); mặc định `generation` | 200 `Member[]`; `X-Total-Count` | 400, 403 |
 | `GET /members/:id` | Thành viên | Không | 200 `Member` | 403, 404 |
 | `POST /members` | Quản trị dòng họ | `family_id`*, `full_name`*, `gender` (mặc định OTHER), `branch_id`, `date_of_birth`, `date_of_death`, `generation`, `occupation`, `education`, `address`, `bio`. `date_of_death` không được trước `date_of_birth` | 201 `Member` | 400, 403 |
 | `PATCH /members/:id` | Quản trị dòng họ | Như POST, trừ `family_id` | 200 `Member` | 400, 403, 404 |
