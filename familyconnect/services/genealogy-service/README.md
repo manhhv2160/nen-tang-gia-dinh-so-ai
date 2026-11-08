@@ -42,9 +42,10 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 - auth (tra cứu tài khoản, nâng GUEST thành FAMILY_MEMBER khi xác minh)
 - report (ghi nhật ký các thao tác tạo, sửa, xóa)
 
-## Danh sách việc
-- [ ] Model và bảng trong `db/init`
-- [ ] Repository, Service, Controller, Route
-- [ ] Endpoint `/internal` và `GET /health`
-- [ ] Phân quyền theo header `X-User-Role` (xem docs/conventions.md)
-- [ ] Cập nhật bảng endpoint trong README này và docs/api-contract.md
+## Đã triển khai
+- Schema PostgreSQL cho `family`, `branch`, `member`, `parent_child_relationship`, `marriage`.
+- CRUD dòng họ, nhánh và thành viên theo API ở trên; danh sách hỗ trợ phân trang, lọc và `X-Total-Count`.
+- Phân quyền theo `X-User-Id`, `X-User-Role` và tư cách thành viên trong dòng họ.
+- `GET /health`.
+
+Các endpoint quan hệ, hôn nhân, cây gia phả, liên kết/xác minh tài khoản và `/internal` vẫn cần được triển khai riêng.
