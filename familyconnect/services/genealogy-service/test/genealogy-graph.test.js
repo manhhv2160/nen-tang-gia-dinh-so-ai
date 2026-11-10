@@ -69,6 +69,34 @@ before(async () => {
             const family = families.get(values[0]);
             return { rows: family ? [family] : [], rowCount: family ? 1 : 0 };
         }
+        if (sql.startsWith('SELECT\n            (SELECT COUNT(*)::int')) {
+            const familyId = values[0];
+            const selectedMembers = [...members.values()]
+                .filter((member) => familyId === null || member.family_id === familyId);
+            const selectedBranches = [...branches.values()]
+                .filter((branch) => familyId === null || branch.family_id === familyId);
+            const selectedFamilies = [...families.values()]
+                .filter((family) => familyId === null || family.family_id === familyId);
+            const membersByGender = { MALE: 0, FEMALE: 0, OTHER: 0 };
+            const membersByGeneration = {};
+            for (const member of selectedMembers) {
+                membersByGender[member.gender] += 1;
+                if (member.generation !== null && member.generation !== undefined) {
+                    membersByGeneration[member.generation] = (membersByGeneration[member.generation] ?? 0) + 1;
+                }
+            }
+            return {
+                rows: [{
+                    families_count: selectedFamilies.length,
+                    branches_count: selectedBranches.length,
+                    members_count: selectedMembers.length,
+                    verified_members_count: selectedMembers.filter((member) => member.is_verified).length,
+                    members_by_gender: membersByGender,
+                    members_by_generation: membersByGeneration,
+                }],
+                rowCount: 1,
+            };
+        }
         if (sql.startsWith('SELECT * FROM branch WHERE branch_id = $1')) {
             const branch = branches.get(values[0]);
             return { rows: branch ? [branch] : [], rowCount: branch ? 1 : 0 };
@@ -278,6 +306,7 @@ test('relationship query returns the route and relative type in both public path
     });
     const unknown = await request('/api/relationships/query?from_member_id=5&to_member_id=9');
     assert.equal((await unknown.json()).data.relation, 'NONE');
+    members.delete('9');
 });
 
 test('address-book q filter searches member name, occupation and address', async () => {
@@ -286,6 +315,58 @@ test('address-book q filter searches member name, occupation and address', async
     const payload = await response.json();
     assert.deepEqual(payload.data.map((member) => member.member_id), ['6']);
     assert.equal(response.headers.get('x-total-count'), '1');
+});
+
+test('internal genealogy stats return aggregate and family-filtered counts', async () => {
+    families.set('2', { family_id: '2', family_name: 'Other family' });
+    branches.set('2', { branch_id: '2', family_id: '2', branch_name: 'Other branch' });
+    members.set('20', {
+        member_id: '20',
+        family_id: '2',
+        branch_id: '2',
+        full_name: 'Other family member',
+        gender: 'OTHER',
+        generation: 1,
+        is_verified: true,
+    });
+
+    const allResponse = await request('/internal/stats');
+    assert.equal(allResponse.status, 200);
+    assert.deepEqual((await allResponse.json()).data, {
+        families_count: 2,
+        branches_count: 2,
+        members_count: 9,
+        verified_members_count: 6,
+        members_by_gender: { MALE: 4, FEMALE: 4, OTHER: 1 },
+        members_by_generation: { '1': 3, '2': 3, '3': 3 },
+    });
+
+    const familyResponse = await request('/internal/stats?family_id=1');
+    assert.deepEqual((await familyResponse.json()).data, {
+        families_count: 1,
+        branches_count: 1,
+        members_count: 8,
+        verified_members_count: 5,
+        members_by_gender: { MALE: 4, FEMALE: 4, OTHER: 0 },
+        members_by_generation: { '1': 2, '2': 3, '3': 3 },
+    });
+
+    const missingFamilyResponse = await request('/internal/stats?family_id=999');
+    assert.deepEqual((await missingFamilyResponse.json()).data, {
+        families_count: 0,
+        branches_count: 0,
+        members_count: 0,
+        verified_members_count: 0,
+        members_by_gender: { MALE: 0, FEMALE: 0, OTHER: 0 },
+        members_by_generation: {},
+    });
+
+    const invalidResponse = await request('/internal/stats?family_id=invalid');
+    assert.equal(invalidResponse.status, 400);
+    assert.equal((await invalidResponse.json()).data.code, 'VALIDATION_ERROR');
+    members.delete('20');
+    branches.delete('2');
+    families.delete('2');
 });
 
 test('sample members, relationships, marriages and tree use the same member IDs', async () => {
