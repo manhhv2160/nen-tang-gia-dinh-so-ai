@@ -5,6 +5,7 @@ import { registerHealthRoute } from '../../../shared/src/healthRoute.js';
 import { conflict, notFound } from './utils/errors.js';
 import branchRoutes from './routes/branch.routes.js';
 import familyRoutes from './routes/family.routes.js';
+import internalRoutes from './routes/internal.routes.js';
 import memberRoutes from './routes/member.routes.js';
 
 const app = express();
@@ -15,6 +16,7 @@ registerHealthRoute(app, 'genealogy-service');
 app.use('/api/families', familyRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/members', memberRoutes);
+app.use('/internal', internalRoutes);
 
 app.use((req, res, next) => next(notFound('Route not found')));
 app.use((error, req, res, next) => {
