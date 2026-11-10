@@ -6,7 +6,10 @@ import { conflict, notFound } from './utils/errors.js';
 import branchRoutes from './routes/branch.routes.js';
 import familyRoutes from './routes/family.routes.js';
 import internalRoutes from './routes/internal.routes.js';
+import marriageRoutes from './routes/marriage.routes.js';
 import memberRoutes from './routes/member.routes.js';
+import relationshipRoutes, { relationQueryRouter } from './routes/relationship.routes.js';
+import treeRoutes from './routes/tree.routes.js';
 
 const app = express();
 
@@ -16,6 +19,10 @@ registerHealthRoute(app, 'genealogy-service');
 app.use('/api/families', familyRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/members', memberRoutes);
+app.use('/api/relationships', relationshipRoutes);
+app.use('/api/marriages', marriageRoutes);
+app.use('/api/tree', treeRoutes);
+app.use('/api/relation-query', relationQueryRouter);
 app.use('/internal', internalRoutes);
 
 app.use((req, res, next) => next(notFound('Route not found')));
