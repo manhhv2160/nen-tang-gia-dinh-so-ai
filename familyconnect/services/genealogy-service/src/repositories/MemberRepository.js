@@ -37,6 +37,17 @@ export async function findById(memberId) {
     return result.rows[0] ?? null;
 }
 
+export async function listMembershipsByUserId(userId) {
+    const result = await pool.query(
+        `SELECT family_id, member_id, is_verified
+         FROM member
+         WHERE user_id = $1
+         ORDER BY family_id, member_id`,
+        [userId],
+    );
+    return result.rows;
+}
+
 export async function create(member) {
     const fields = [
         'family_id', 'branch_id', 'full_name', 'gender', 'date_of_birth', 'date_of_death',
