@@ -99,6 +99,13 @@ before(async () => {
             const member = members.get(values[0]);
             return { rows: member ? [member] : [], rowCount: member ? 1 : 0 };
         }
+        if (sql.startsWith('SELECT family_id, member_id, is_verified')) {
+            const rows = [...members.values()]
+                .filter((member) => member.user_id === values[0])
+                .sort((left, right) => Number(BigInt(left.family_id) - BigInt(right.family_id)))
+                .map(({ family_id, member_id, is_verified }) => ({ family_id, member_id, is_verified }));
+            return { rows, rowCount: rows.length };
+        }
         if (sql.startsWith('SELECT 1 FROM member WHERE user_id = $1 AND family_id = $2')) {
             return { rows: [], rowCount: 0 };
         }
@@ -169,6 +176,65 @@ test('member API creates, reads, updates and deletes a member', async () => {
     const deleteResponse = await request(`/api/members/${created.member_id}`, 'DELETE');
     assert.equal(deleteResponse.status, 200);
     assert.equal((await deleteResponse.json()).data, null);
+});
+
+test('internal memberships returns every family linked to the requested user', async () => {
+    members.set('90011', {
+        member_id: '90011',
+        family_id: '12',
+        user_id: '42',
+        full_name: 'Member One',
+        is_verified: true,
+    });
+    members.set('90012', {
+        member_id: '90012',
+        family_id: '3',
+        user_id: '42',
+        full_name: 'Member Two',
+        is_verified: false,
+    });
+    members.set('90013', {
+        member_id: '90013',
+        family_id: '4',
+        user_id: '43',
+        full_name: 'Another User',
+        is_verified: true,
+    });
+
+    const response = await fetch(`${baseUrl}/internal/memberships?user_id=42`);
+    assert.equal(response.status, 200);
+    assert.deepEqual((await response.json()).data, {
+        user_id: '42',
+        memberships: [
+            { family_id: '3', member_id: '90012', is_verified: false },
+            { family_id: '12', member_id: '90011', is_verified: true },
+        ],
+    });
+
+    const emptyResponse = await fetch(`${baseUrl}/internal/memberships?user_id=99`);
+    assert.equal(emptyResponse.status, 200);
+    assert.deepEqual((await emptyResponse.json()).data, {
+        user_id: '99',
+        memberships: [],
+    });
+});
+
+test('internal member lookup returns the member record or 404', async () => {
+    members.set('90021', {
+        member_id: '90021',
+        family_id: '8',
+        user_id: '42',
+        full_name: 'Internal Member',
+        is_verified: true,
+    });
+
+    const response = await fetch(`${baseUrl}/internal/members/90021`);
+    assert.equal(response.status, 200);
+    assert.deepEqual((await response.json()).data, members.get('90021'));
+
+    const missingResponse = await fetch(`${baseUrl}/internal/members/99999`);
+    assert.equal(missingResponse.status, 404);
+    assert.equal((await missingResponse.json()).data.code, 'NOT_FOUND');
 });
 
 test('member API rejects invalid gender before writing', async () => {
