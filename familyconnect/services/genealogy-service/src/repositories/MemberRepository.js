@@ -14,7 +14,10 @@ export async function listByFamily(familyId, { filters, limit, offset, sortField
     if (filters.is_verified !== undefined) addCondition('is_verified = ?', filters.is_verified);
     if (filters.occupation !== undefined) addCondition('occupation ILIKE ?', `%${filters.occupation}%`);
     if (filters.address !== undefined) addCondition('address ILIKE ?', `%${filters.address}%`);
-    if (filters.q !== undefined) addCondition('full_name ILIKE ?', `%${filters.q}%`);
+    if (filters.q !== undefined) {
+        values.push(`%${filters.q}%`);
+        conditions.push(`(full_name ILIKE $${values.length} OR occupation ILIKE $${values.length} OR address ILIKE $${values.length})`);
+    }
 
     const where = conditions.join(' AND ');
     const countResult = await pool.query(`SELECT COUNT(*)::int AS total FROM member WHERE ${where}`, values);
