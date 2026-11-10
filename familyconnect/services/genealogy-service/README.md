@@ -32,9 +32,9 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 ## Endpoint nội bộ (`/internal`, gateway không công khai)
 | Phương thức | Đường dẫn | Mô tả |
 |---|---|---|
-| GET | `/internal/members/:id` | Hồ sơ một thành viên |
+| GET | `/internal/members/:id` | Hồ sơ một thành viên; 404 nếu không tồn tại |
 | GET | `/internal/members/search?q=&family_ids=` | Tìm thành viên theo từ khóa và các dòng họ được phép |
-| GET | `/internal/memberships?user_id=` | Người dùng thuộc dòng họ nào |
+| GET | `/internal/memberships?user_id=` | Liệt kê tất cả dòng họ liên kết với tài khoản qua các thành viên; mảng rỗng nếu chưa liên kết |
 | GET | `/internal/relation-query?from_member_id=&to_member_id=` | Truy vấn quan hệ cho ai-service |
 | GET | `/internal/stats?family_id=` | Số liệu cho dashboard (lọc dòng họ tùy chọn) |
 
