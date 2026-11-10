@@ -37,7 +37,7 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 | GET | `/internal/members/search?q=&family_ids=` | Tìm thành viên theo từ khóa và các dòng họ được phép |
 | GET | `/internal/memberships?user_id=` | Liệt kê tất cả dòng họ liên kết với tài khoản qua các thành viên; mảng rỗng nếu chưa liên kết |
 | GET | `/internal/relation-query?from_member_id=&to_member_id=` | Truy vấn quan hệ cho ai-service |
-| GET | `/internal/stats?family_id=` | Số liệu cho dashboard (lọc dòng họ tùy chọn) |
+| GET | `/internal/stats?family_id=` | Số liệu gia phả cho report-service; lọc dòng họ tùy chọn |
 
 ## Gọi tới service khác
 - auth (tra cứu tài khoản, nâng GUEST thành FAMILY_MEMBER khi xác minh)
