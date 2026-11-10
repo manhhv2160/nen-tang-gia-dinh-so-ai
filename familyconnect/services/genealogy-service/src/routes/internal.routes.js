@@ -6,5 +6,6 @@ const router = Router();
 router.get('/memberships', InternalController.memberships);
 router.get('/members/:id', InternalController.getMember);
 router.get('/relation-query', InternalController.relationQuery);
+router.get('/stats', InternalController.stats);
 
 export default router;

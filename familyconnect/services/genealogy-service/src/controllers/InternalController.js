@@ -1,5 +1,6 @@
 import { ApiResponse } from '../../../../shared/src/ApiResponse.js';
 import * as MemberRepository from '../repositories/MemberRepository.js';
+import * as StatsRepository from '../repositories/StatsRepository.js';
 import * as RelationshipQueryService from '../services/RelationshipQueryService.js';
 import { notFound } from '../utils/errors.js';
 import { parseId } from '../utils/validation.js';
@@ -22,5 +23,13 @@ export async function relationQuery(req, res) {
         req.query.from_member_id,
         req.query.to_member_id,
     );
+    return ApiResponse.ok(res, data);
+}
+
+export async function stats(req, res) {
+    const familyId = req.query.family_id === undefined
+        ? null
+        : parseId(req.query.family_id, 'family_id');
+    const data = await StatsRepository.getStats(familyId);
     return ApiResponse.ok(res, data);
 }
