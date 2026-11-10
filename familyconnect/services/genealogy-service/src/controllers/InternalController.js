@@ -1,5 +1,6 @@
 import { ApiResponse } from '../../../../shared/src/ApiResponse.js';
 import * as MemberRepository from '../repositories/MemberRepository.js';
+import * as RelationshipQueryService from '../services/RelationshipQueryService.js';
 import { notFound } from '../utils/errors.js';
 import { parseId } from '../utils/validation.js';
 
@@ -14,4 +15,12 @@ export async function getMember(req, res) {
     const member = await MemberRepository.findById(memberId);
     if (!member) throw notFound('Member not found');
     return ApiResponse.ok(res, member);
+}
+
+export async function relationQuery(req, res) {
+    const data = await RelationshipQueryService.query(
+        req.query.from_member_id,
+        req.query.to_member_id,
+    );
+    return ApiResponse.ok(res, data);
 }
