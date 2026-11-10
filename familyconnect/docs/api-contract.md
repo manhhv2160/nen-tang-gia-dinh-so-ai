@@ -261,7 +261,7 @@ Gọi đồng bộ, timeout 3 giây, khuôn response giống API công khai. Khi
 | `GET /internal/members/:id` | genealogy | ai | Không | Một hồ sơ `Member`; 404 nếu không tồn tại |
 | `GET /internal/members/search` | genealogy | ai | `q`*, `family_ids`* (cách nhau dấu phẩy), `limit` (mặc định 10) | Danh sách `{ member_id, full_name, generation, family_id }` |
 | `GET /internal/relation-query` | genealogy | ai | `from_member_id`*, `to_member_id`* | Giống `GET /relation-query` |
-| `GET /internal/stats` | genealogy | report | `family_id` (tùy chọn) | `{ families_count, branches_count, members_count, verified_members_count, members_by_gender, members_by_generation }` |
+| `GET /internal/stats` | genealogy | report | `family_id` (tùy chọn; bỏ trống để thống kê toàn hệ thống) | `{ families_count, branches_count, members_count, verified_members_count, members_by_gender, members_by_generation }`. `members_by_gender` luôn có `MALE`, `FEMALE`, `OTHER` (0 nếu không có); `members_by_generation` là đối tượng `{ "<generation>": count }`, bỏ qua generation chưa xác định. Family ID không tồn tại trả số liệu 0 |
 | `GET /internal/stats` | community | report | `family_id` (tùy chọn) | `{ posts_count, comments_count, reactions_count, posts_by_type }` |
 | `GET /internal/stats` | event | report | `family_id` (tùy chọn) | `{ events_count, upcoming_events_count, rsvps_by_status }` |
 | `GET /internal/stats` | heritage | report | `family_id` (tùy chọn) | `{ heritage_count, heritage_by_type }` |
