@@ -257,8 +257,8 @@ Gọi đồng bộ, timeout 3 giây, khuôn response giống API công khai. Khi
 | `GET /internal/users` | auth | genealogy, report | `ids`* (tối đa 100) | Danh sách như trên |
 | `PATCH /internal/users/:id/role` | auth | genealogy | Body: `role`* | `User`. genealogy chỉ gọi để nâng GUEST lên FAMILY_MEMBER khi xác minh thành viên; ghi nhật ký `ROLE_CHANGE` |
 | `GET /internal/stats` | auth | report | Không | `{ users_count, users_by_role }` |
-| `GET /internal/memberships` | genealogy | community, event, heritage, ai, report | `user_id`* | `{ user_id, memberships }`, mỗi phần tử là `{ family_id, member_id, is_verified }` |
-| `GET /internal/members/:id` | genealogy | ai | Không | `Member` |
+| `GET /internal/memberships` | genealogy | community, event, heritage, ai, report | `user_id`* | `{ user_id, memberships }`, một mục cho mỗi thành viên được liên kết với tài khoản; mỗi phần tử là `{ family_id, member_id, is_verified }`. Không có thành viên thì trả `memberships: []` |
+| `GET /internal/members/:id` | genealogy | ai | Không | Một hồ sơ `Member`; 404 nếu không tồn tại |
 | `GET /internal/members/search` | genealogy | ai | `q`*, `family_ids`* (cách nhau dấu phẩy), `limit` (mặc định 10) | Danh sách `{ member_id, full_name, generation, family_id }` |
 | `GET /internal/relation-query` | genealogy | ai | `from_member_id`*, `to_member_id`* | Giống `GET /relation-query` |
 | `GET /internal/stats` | genealogy | report | `family_id` (tùy chọn) | `{ families_count, branches_count, members_count, verified_members_count, members_by_gender, members_by_generation }` |
