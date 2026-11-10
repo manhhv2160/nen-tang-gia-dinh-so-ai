@@ -15,6 +15,7 @@ export const ROUTES = [
     { prefix: '/api/v1/relationships', target: 'http://localhost:3002' },
     { prefix: '/api/v1/marriages', target: 'http://localhost:3002' },
     { prefix: '/api/v1/tree', target: 'http://localhost:3002' },
+    { prefix: '/api/v1/relation-query', target: 'http://localhost:3002' },
     { prefix: '/api/v1/posts', target: 'http://localhost:3003' },
     { prefix: '/api/v1/comments', target: 'http://localhost:3003' },
     { prefix: '/api/v1/reactions', target: 'http://localhost:3003' },
