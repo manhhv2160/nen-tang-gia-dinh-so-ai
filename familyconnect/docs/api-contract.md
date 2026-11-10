@@ -162,7 +162,7 @@ Tên người dùng không nằm trong các đối tượng trên. Frontend gom 
 | `POST /branches` | Quản trị dòng họ | `family_id`*, `branch_name`*, `description` | 201 `Branch` | 400, 403 |
 | `PATCH /branches/:id` | Quản trị dòng họ | `branch_name`, `description` | 200 `Branch` | 400, 403, 404 |
 | `DELETE /branches/:id` | Quản trị dòng họ | Không. Thành viên của nhánh được đặt `branch_id` là null | 200 null | 403, 404 |
-| `GET /members` | Thành viên | `family_id`*. Lọc `branch_id`, `generation`, `gender`, `is_verified`, `occupation` (chứa), `address` (chứa), `q` (họ tên chứa, không phân biệt hoa thường). `limit` (mặc định 50, tối đa 100), `offset` (mặc định 0). Sort `full_name`, `generation`, `date_of_birth` (thêm `-` để giảm dần); mặc định `generation` | 200 `Member[]`; `X-Total-Count` | 400, 403 |
+| `GET /members` | Thành viên | `family_id`*. Lọc `branch_id`, `generation`, `gender`, `is_verified`, `occupation` (chứa), `address` (chứa), `q` (họ tên, nghề nghiệp hoặc địa chỉ chứa; không phân biệt hoa thường). `limit` (mặc định 50, tối đa 100), `offset` (mặc định 0). Sort `full_name`, `generation`, `date_of_birth` (thêm `-` để giảm dần); mặc định `generation` | 200 `Member[]`; `X-Total-Count` | 400, 403 |
 | `GET /members/:id` | Thành viên | Không | 200 `Member` | 403, 404 |
 | `POST /members` | Quản trị dòng họ | `family_id`*, `full_name`*, `gender` (mặc định OTHER), `branch_id`, `date_of_birth`, `date_of_death`, `generation`, `occupation`, `education`, `address`, `bio`. `date_of_death` không được trước `date_of_birth` | 201 `Member` | 400, 403 |
 | `PATCH /members/:id` | Quản trị dòng họ | Như POST, trừ `family_id` | 200 `Member` | 400, 403, 404 |
@@ -178,7 +178,7 @@ Tên người dùng không nằm trong các đối tượng trên. Frontend gom 
 | `PATCH /marriages/:id` | Quản trị dòng họ | `marriage_date`, `status` | 200 `Marriage` | 400, 403, 404 |
 | `DELETE /marriages/:id` | Quản trị dòng họ | Không | 200 null | 403, 404 |
 | `GET /tree` | Thành viên | `family_id`*. Tùy chọn: `branch_id`; `root_member_id` kèm `depth` (số thế hệ đi xuống, tối đa 10; bỏ trống là lấy hết) | 200 `{ family_id, nodes, edges }` (ví dụ ở mục 7) | 400, 403, 404 |
-| `GET /relation-query` | Thành viên | `from_member_id`*, `to_member_id`* | 200 `{ from_member_id, to_member_id, relation, path }`. `path` là danh sách `{ member_id, step }`, `step` là PARENT, CHILD hoặc SPOUSE. Nếu `relation` là NONE thì `path` rỗng | 400, 403, 404 |
+| `GET /relationships/query` | Thành viên | `from_member_id`*, `to_member_id`* (cùng dòng họ) | 200 `{ from_member_id, to_member_id, relation, path }`. `path` là danh sách `{ member_id, step }`, `step` là PARENT, CHILD hoặc SPOUSE. Nếu `relation` là NONE thì `path` rỗng. Hỗ trợ alias `GET /relation-query` | 400, 403, 404 |
 
 ### 5.3 community-service (Người 3)
 
