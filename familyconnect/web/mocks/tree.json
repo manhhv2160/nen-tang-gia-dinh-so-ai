@@ -1,0 +1,29 @@
+{
+  "success": true,
+  "status_code": 200,
+  "message": "OK",
+  "data": {
+    "family_id": "1",
+    "nodes": [
+      { "member_id": "1", "full_name": "Nguyễn Văn An", "gender": "MALE", "date_of_birth": "1930-01-15", "date_of_death": "2010-06-02", "generation": 1, "branch_id": "1", "is_verified": true },
+      { "member_id": "2", "full_name": "Lê Thị Hoa", "gender": "FEMALE", "date_of_birth": "1934-08-20", "date_of_death": null, "generation": 1, "branch_id": "1", "is_verified": true },
+      { "member_id": "3", "full_name": "Nguyễn Văn Bình", "gender": "MALE", "date_of_birth": "1958-03-12", "date_of_death": null, "generation": 2, "branch_id": "1", "is_verified": true },
+      { "member_id": "4", "full_name": "Trần Thị Mai", "gender": "FEMALE", "date_of_birth": "1960-11-05", "date_of_death": null, "generation": 2, "branch_id": "1", "is_verified": true },
+      { "member_id": "5", "full_name": "Nguyễn Minh Khang", "gender": "MALE", "date_of_birth": "1985-07-05", "date_of_death": null, "generation": 3, "branch_id": "1", "is_verified": true },
+      { "member_id": "6", "full_name": "Nguyễn Thu Hà", "gender": "FEMALE", "date_of_birth": "1989-09-21", "date_of_death": null, "generation": 3, "branch_id": "1", "is_verified": false },
+      { "member_id": "7", "full_name": "Nguyễn Thị Cúc", "gender": "FEMALE", "date_of_birth": "1962-01-01", "date_of_death": null, "generation": 2, "branch_id": "1", "is_verified": false },
+      { "member_id": "8", "full_name": "Lê Gia Phúc", "gender": "MALE", "date_of_birth": "1990-01-01", "date_of_death": null, "generation": 3, "branch_id": "1", "is_verified": false }
+    ],
+    "edges": [
+      { "type": "PARENT_CHILD", "relationship_id": "1", "parent_member_id": "1", "child_member_id": "3", "relationship_type": "BIOLOGICAL" },
+      { "type": "PARENT_CHILD", "relationship_id": "2", "parent_member_id": "2", "child_member_id": "3", "relationship_type": "BIOLOGICAL" },
+      { "type": "PARENT_CHILD", "relationship_id": "3", "parent_member_id": "3", "child_member_id": "5", "relationship_type": "BIOLOGICAL" },
+      { "type": "PARENT_CHILD", "relationship_id": "4", "parent_member_id": "4", "child_member_id": "5", "relationship_type": "BIOLOGICAL" },
+      { "type": "PARENT_CHILD", "relationship_id": "5", "parent_member_id": "3", "child_member_id": "6", "relationship_type": "BIOLOGICAL" },
+      { "type": "PARENT_CHILD", "relationship_id": "6", "parent_member_id": "1", "child_member_id": "7", "relationship_type": "ADOPTED" },
+      { "type": "PARENT_CHILD", "relationship_id": "7", "parent_member_id": "7", "child_member_id": "8", "relationship_type": "BIOLOGICAL" },
+      { "type": "MARRIAGE", "marriage_id": "1", "spouse_1_member_id": "1", "spouse_2_member_id": "2", "marriage_date": "1955-02-10", "status": "MARRIED" },
+      { "type": "MARRIAGE", "marriage_id": "2", "spouse_1_member_id": "3", "spouse_2_member_id": "4", "marriage_date": "1983-05-21", "status": "MARRIED" }
+    ]
+  }
+}
