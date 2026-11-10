@@ -23,11 +23,12 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 | POST | `/members/:id/link-user` | Liên kết thành viên với tài khoản |
 | POST | `/members/:id/verify` | Xác minh thành viên; có thể nâng vai trò tài khoản đã liên kết |
 | GET, POST | `/relationships` | Tra cứu theo `parent_member_id`, `child_member_id` hoặc `member_id`; tạo quan hệ cha-con |
+| GET | `/relationships/query?from_member_id=&to_member_id=` | Truy vấn đường đi và loại quan hệ |
 | PATCH, DELETE | `/relationships/:id` | Sửa loại quan hệ hoặc xóa quan hệ |
 | GET, POST | `/marriages` | Liệt kê hôn nhân theo `member_id` hoặc tạo hôn nhân |
 | PATCH, DELETE | `/marriages/:id` | Sửa hoặc xóa hôn nhân |
 | GET | `/tree?family_id=` | Dữ liệu cây gia phả; tùy chọn `branch_id`, hoặc `root_member_id` kèm `depth` |
-| GET | `/relation-query?from_member_id=&to_member_id=` | Truy vấn quan hệ giữa hai thành viên |
+| GET | `/relation-query?from_member_id=&to_member_id=` | Alias tương thích cho truy vấn quan hệ |
 
 ## Endpoint nội bộ (`/internal`, gateway không công khai)
 | Phương thức | Đường dẫn | Mô tả |
