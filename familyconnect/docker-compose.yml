@@ -54,8 +54,10 @@ services:
       PORT: 3002
       DATABASE_URL: postgres://genealogy_svc:genealogy_dev_pw@db:5432/genealogy_db
       AUTH_URL: http://auth-service:3001
+      REPORT_URL: http://report-service:3007
     depends_on:
       - db
+      - report-service
 
   community-service:
     build:
