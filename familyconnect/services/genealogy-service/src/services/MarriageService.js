@@ -1,4 +1,5 @@
 import { MarriageStatus, Roles } from '../../../../shared/src/enums.js';
+import { sendAuditEvent } from '../clients/AuditClient.js';
 import * as MarriageRepository from '../repositories/MarriageRepository.js';
 import * as MemberRepository from '../repositories/MemberRepository.js';
 import { assertFamilyAccess } from './access.js';
@@ -41,12 +42,20 @@ export async function create(user, body) {
     const status = parseStatus(body?.status, true);
     const { familyId } = await findSpouses(spouse1Id, spouse2Id);
     await assertFamilyAccess(user, familyId, Roles.FAMILY_ADMIN);
-    return MarriageRepository.create({
+    const marriage = await MarriageRepository.create({
         spouse_1_member_id: spouse1Id,
         spouse_2_member_id: spouse2Id,
         marriage_date: marriageDate,
         status,
     });
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'CREATE',
+        entityType: 'MARRIAGE',
+        entityId: marriage.marriage_id,
+        familyId,
+    });
+    return marriage;
 }
 
 export async function update(user, marriageId, body) {
@@ -60,12 +69,28 @@ export async function update(user, marriageId, body) {
     if (Object.hasOwn(body, 'marriage_date')) changes.marriage_date = parseDate(body.marriage_date, 'marriage_date');
     if (Object.hasOwn(body, 'status')) changes.status = parseStatus(body.status);
     if (!Object.keys(changes).length) failValidation({ body: 'must include marriage_date or status' });
-    return MarriageRepository.update(marriageId, changes);
+    const updatedMarriage = await MarriageRepository.update(marriageId, changes);
+    if (!updatedMarriage) throw notFound('Marriage not found');
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'UPDATE',
+        entityType: 'MARRIAGE',
+        entityId: marriageId,
+        familyId: marriage.family_id,
+    });
+    return updatedMarriage;
 }
 
 export async function remove(user, marriageId) {
     const marriage = await MarriageRepository.findById(marriageId);
     if (!marriage) throw notFound('Marriage not found');
     await assertFamilyAccess(user, marriage.family_id, Roles.FAMILY_ADMIN);
-    await MarriageRepository.remove(marriageId);
+    if (!(await MarriageRepository.remove(marriageId))) throw notFound('Marriage not found');
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'DELETE',
+        entityType: 'MARRIAGE',
+        entityId: marriageId,
+        familyId: marriage.family_id,
+    });
 }

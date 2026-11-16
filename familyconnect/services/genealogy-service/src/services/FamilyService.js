@@ -1,4 +1,5 @@
 import { Roles } from '../../../../shared/src/enums.js';
+import { sendAuditEvent } from '../clients/AuditClient.js';
 import * as FamilyRepository from '../repositories/FamilyRepository.js';
 import { assertFamilyAccess } from './access.js';
 import { conflict, notFound } from '../utils/errors.js';
@@ -57,10 +58,18 @@ export async function get(user, rawId) {
 }
 
 export async function create(user, body) {
-    return FamilyRepository.create({
+    const family = await FamilyRepository.create({
         ...parseFamilyBody(body, true),
         user_id: user.userId,
     });
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'CREATE',
+        entityType: 'FAMILY',
+        entityId: family.family_id,
+        familyId: family.family_id,
+    });
+    return family;
 }
 
 export async function update(user, familyId, body) {
@@ -68,14 +77,30 @@ export async function update(user, familyId, body) {
     if (!family) throw notFound('Family not found');
     await assertFamilyAccess(user, familyId, Roles.FAMILY_ADMIN);
     try {
-        return await FamilyRepository.update(familyId, parseFamilyBody(body, false));
+        const updatedFamily = await FamilyRepository.update(familyId, parseFamilyBody(body, false));
+        if (!updatedFamily) throw notFound('Family not found');
+        sendAuditEvent({
+            userId: user.userId,
+            action: 'UPDATE',
+            entityType: 'FAMILY',
+            entityId: familyId,
+            familyId,
+        });
+        return updatedFamily;
     } catch (error) {
         if (error.code === '23505') throw conflict();
         throw error;
     }
 }
 
-export async function remove(familyId) {
+export async function remove(user, familyId) {
     const removed = await FamilyRepository.remove(familyId);
     if (!removed) throw notFound('Family not found');
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'DELETE',
+        entityType: 'FAMILY',
+        entityId: familyId,
+        familyId,
+    });
 }

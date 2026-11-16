@@ -22,6 +22,6 @@ export async function update(req, res) {
 }
 
 export async function remove(req, res) {
-    await FamilyService.remove(parseId(req.params.id));
+    await FamilyService.remove(req.user, parseId(req.params.id));
     return res.status(200).json({ success: true, status_code: 200, message: 'Family deleted', data: null });
 }

@@ -1,4 +1,5 @@
 import { Gender, Roles } from '../../../../shared/src/enums.js';
+import { sendAuditEvent } from '../clients/AuditClient.js';
 import * as BranchRepository from '../repositories/BranchRepository.js';
 import * as FamilyRepository from '../repositories/FamilyRepository.js';
 import * as MemberRepository from '../repositories/MemberRepository.js';
@@ -128,7 +129,15 @@ export async function create(user, body) {
     const changes = parseMemberBody(body, true);
     await validateBranch(familyId, changes.branch_id);
     try {
-        return await MemberRepository.create({ family_id: familyId, ...changes });
+        const member = await MemberRepository.create({ family_id: familyId, ...changes });
+        sendAuditEvent({
+            userId: user.userId,
+            action: 'CREATE',
+            entityType: 'MEMBER',
+            entityId: member.member_id,
+            familyId,
+        });
+        return member;
     } catch (error) {
         if (error.code === '23503') throw notFound('Family or branch not found');
         if (error.code === '23505') throw conflict('Member is already linked in this family');
@@ -145,12 +154,28 @@ export async function update(user, memberId, body) {
     const dateOfBirth = Object.hasOwn(changes, 'date_of_birth') ? changes.date_of_birth : member.date_of_birth;
     const dateOfDeath = Object.hasOwn(changes, 'date_of_death') ? changes.date_of_death : member.date_of_death;
     assertDateOrder(dateOfBirth, dateOfDeath);
-    return MemberRepository.update(memberId, changes);
+    const updatedMember = await MemberRepository.update(memberId, changes);
+    if (!updatedMember) throw notFound('Member not found');
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'UPDATE',
+        entityType: 'MEMBER',
+        entityId: memberId,
+        familyId: member.family_id,
+    });
+    return updatedMember;
 }
 
 export async function remove(user, memberId) {
     const member = await MemberRepository.findById(memberId);
     if (!member) throw notFound('Member not found');
     await assertFamilyAccess(user, member.family_id, Roles.FAMILY_ADMIN);
-    await MemberRepository.remove(memberId);
+    if (!(await MemberRepository.remove(memberId))) throw notFound('Member not found');
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'DELETE',
+        entityType: 'MEMBER',
+        entityId: memberId,
+        familyId: member.family_id,
+    });
 }

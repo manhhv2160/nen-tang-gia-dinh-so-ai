@@ -1,4 +1,5 @@
 import { RelationshipTypes, Roles } from '../../../../shared/src/enums.js';
+import { sendAuditEvent } from '../clients/AuditClient.js';
 import * as FamilyRepository from '../repositories/FamilyRepository.js';
 import * as MemberRepository from '../repositories/MemberRepository.js';
 import * as RelationshipRepository from '../repositories/RelationshipRepository.js';
@@ -52,6 +53,13 @@ export async function create(user, body) {
         if (!relationship) {
             failValidation({ child_member_id: 'relationship would create an ancestor cycle' });
         }
+        sendAuditEvent({
+            userId: user.userId,
+            action: 'CREATE',
+            entityType: 'RELATIONSHIP',
+            entityId: relationship.relationship_id,
+            familyId,
+        });
         return relationship;
     } catch (error) {
         if (error.code === '23505') throw conflict('Parent-child relationship already exists');
@@ -64,12 +72,28 @@ export async function update(user, relationshipId, body) {
     if (!relationship) throw notFound('Relationship not found');
     await assertFamilyAccess(user, relationship.family_id, Roles.FAMILY_ADMIN);
     const type = parseType(body?.relationship_type);
-    return RelationshipRepository.update(relationshipId, type);
+    const updatedRelationship = await RelationshipRepository.update(relationshipId, type);
+    if (!updatedRelationship) throw notFound('Relationship not found');
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'UPDATE',
+        entityType: 'RELATIONSHIP',
+        entityId: relationshipId,
+        familyId: relationship.family_id,
+    });
+    return updatedRelationship;
 }
 
 export async function remove(user, relationshipId) {
     const relationship = await RelationshipRepository.findById(relationshipId);
     if (!relationship) throw notFound('Relationship not found');
     await assertFamilyAccess(user, relationship.family_id, Roles.FAMILY_ADMIN);
-    await RelationshipRepository.remove(relationshipId);
+    if (!(await RelationshipRepository.remove(relationshipId))) throw notFound('Relationship not found');
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'DELETE',
+        entityType: 'RELATIONSHIP',
+        entityId: relationshipId,
+        familyId: relationship.family_id,
+    });
 }
