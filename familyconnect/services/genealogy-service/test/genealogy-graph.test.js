@@ -31,6 +31,8 @@ const marriages = new Map([
     ['2', { marriage_id: '2', spouse_1_member_id: '3', spouse_2_member_id: '4', marriage_date: '1983-05-21', status: 'MARRIED', created_at: now, updated_at: now }],
 ]);
 const originalQuery = pool.query.bind(pool);
+const originalFetch = globalThis.fetch;
+const auditEvents = [];
 let nextRelationshipId = 20;
 let nextMarriageId = 20;
 let server;
@@ -64,6 +66,13 @@ function filteredMembers(sql, values) {
 }
 
 before(async () => {
+    globalThis.fetch = (input, options) => {
+        if (new URL(String(input)).pathname === '/internal/audit') {
+            auditEvents.push(JSON.parse(options.body));
+            return new Promise(() => {});
+        }
+        return originalFetch(input, options);
+    };
     pool.query = async (sql, values = []) => {
         if (sql.startsWith('SELECT * FROM family WHERE family_id = $1')) {
             const family = families.get(values[0]);
@@ -210,6 +219,7 @@ before(async () => {
 after(async () => {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
     pool.query = originalQuery;
+    globalThis.fetch = originalFetch;
 });
 
 async function request(path, method = 'GET', body) {
@@ -240,6 +250,7 @@ test('tree API returns nodes and parent/marriage edges matching the sample famil
 });
 
 test('relationship CRUD rejects ancestor cycles and supports the sample relationship types', async () => {
+    const auditStart = auditEvents.length;
     const createResponse = await request('/api/relationships', 'POST', {
         parent_member_id: '4',
         child_member_id: '8',
@@ -261,9 +272,19 @@ test('relationship CRUD rejects ancestor cycles and supports the sample relation
     });
     assert.equal((await updateResponse.json()).data.relationship_type, 'ADOPTED');
     assert.equal((await request(`/api/relationships/${relationshipId}`, 'DELETE')).status, 200);
+    assert.deepEqual(
+        auditEvents.slice(auditStart).map(({ action, entity_type, entity_id, family_id }) =>
+            [action, entity_type, entity_id, family_id]),
+        [
+            ['CREATE', 'RELATIONSHIP', relationshipId, '1'],
+            ['UPDATE', 'RELATIONSHIP', relationshipId, '1'],
+            ['DELETE', 'RELATIONSHIP', relationshipId, '1'],
+        ],
+    );
 });
 
 test('marriage CRUD validates and returns member marriages', async () => {
+    const auditStart = auditEvents.length;
     const createResponse = await request('/api/marriages', 'POST', {
         spouse_1_member_id: '5',
         spouse_2_member_id: '6',
@@ -281,6 +302,15 @@ test('marriage CRUD validates and returns member marriages', async () => {
     });
     assert.equal((await updateResponse.json()).data.status, 'DIVORCED');
     assert.equal((await request(`/api/marriages/${marriage.marriage_id}`, 'DELETE')).status, 200);
+    assert.deepEqual(
+        auditEvents.slice(auditStart).map(({ action, entity_type, entity_id, family_id }) =>
+            [action, entity_type, entity_id, family_id]),
+        [
+            ['CREATE', 'MARRIAGE', marriage.marriage_id, '1'],
+            ['UPDATE', 'MARRIAGE', marriage.marriage_id, '1'],
+            ['DELETE', 'MARRIAGE', marriage.marriage_id, '1'],
+        ],
+    );
 });
 
 test('relationship query returns the route and relative type in both public paths', async () => {

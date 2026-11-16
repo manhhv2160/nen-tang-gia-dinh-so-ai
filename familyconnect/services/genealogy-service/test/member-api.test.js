@@ -7,10 +7,19 @@ const members = new Map();
 const families = new Map();
 const branches = new Map();
 const originalQuery = pool.query.bind(pool);
+const originalFetch = globalThis.fetch;
+const auditEvents = [];
 let server;
 let baseUrl;
 
 before(async () => {
+    globalThis.fetch = (input, options) => {
+        if (new URL(String(input)).pathname === '/internal/audit') {
+            auditEvents.push(JSON.parse(options.body));
+            return new Promise(() => {});
+        }
+        return originalFetch(input, options);
+    };
     pool.query = async (sql, values = []) => {
         if (sql.startsWith('INSERT INTO family')) {
             const family = {
@@ -133,6 +142,7 @@ before(async () => {
 after(async () => {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
     pool.query = originalQuery;
+    globalThis.fetch = originalFetch;
 });
 
 async function request(path, method, body, { userId = '1', role = 'SYSTEM_ADMIN' } = {}) {
@@ -148,6 +158,7 @@ async function request(path, method, body, { userId = '1', role = 'SYSTEM_ADMIN'
 }
 
 test('member API creates, reads, updates and deletes a member', async () => {
+    const auditStart = auditEvents.length;
     const healthResponse = await fetch(`${baseUrl}/health`);
     assert.equal(healthResponse.status, 200);
     assert.equal((await healthResponse.json()).data.status, 'UP');
@@ -176,6 +187,29 @@ test('member API creates, reads, updates and deletes a member', async () => {
     const deleteResponse = await request(`/api/members/${created.member_id}`, 'DELETE');
     assert.equal(deleteResponse.status, 200);
     assert.equal((await deleteResponse.json()).data, null);
+    assert.deepEqual(auditEvents.slice(auditStart), [
+        {
+            user_id: '1',
+            action: 'CREATE',
+            entity_type: 'MEMBER',
+            entity_id: '90001',
+            family_id: '1',
+        },
+        {
+            user_id: '1',
+            action: 'UPDATE',
+            entity_type: 'MEMBER',
+            entity_id: '90001',
+            family_id: '1',
+        },
+        {
+            user_id: '1',
+            action: 'DELETE',
+            entity_type: 'MEMBER',
+            entity_id: '90001',
+            family_id: '1',
+        },
+    ]);
 });
 
 test('internal memberships returns every family linked to the requested user', async () => {
@@ -275,6 +309,7 @@ test('family administrators must belong to the family before adding a member', a
 });
 
 test('family and branch APIs support create, read, update and delete', async () => {
+    const auditStart = auditEvents.length;
     const familyCreate = await request('/api/families', 'POST', {
         family_name: 'Nguyen',
         origin_place: 'Ha Noi',
@@ -305,4 +340,48 @@ test('family and branch APIs support create, read, update and delete', async () 
 
     assert.equal((await request(`/api/branches/${branch.branch_id}`, 'DELETE')).status, 200);
     assert.equal((await request(`/api/families/${family.family_id}`, 'DELETE')).status, 200);
+    assert.deepEqual(auditEvents.slice(auditStart), [
+        {
+            user_id: '1',
+            action: 'CREATE',
+            entity_type: 'FAMILY',
+            entity_id: family.family_id,
+            family_id: family.family_id,
+        },
+        {
+            user_id: '1',
+            action: 'UPDATE',
+            entity_type: 'FAMILY',
+            entity_id: family.family_id,
+            family_id: family.family_id,
+        },
+        {
+            user_id: '1',
+            action: 'CREATE',
+            entity_type: 'BRANCH',
+            entity_id: branch.branch_id,
+            family_id: family.family_id,
+        },
+        {
+            user_id: '1',
+            action: 'UPDATE',
+            entity_type: 'BRANCH',
+            entity_id: branch.branch_id,
+            family_id: family.family_id,
+        },
+        {
+            user_id: '1',
+            action: 'DELETE',
+            entity_type: 'BRANCH',
+            entity_id: branch.branch_id,
+            family_id: family.family_id,
+        },
+        {
+            user_id: '1',
+            action: 'DELETE',
+            entity_type: 'FAMILY',
+            entity_id: family.family_id,
+            family_id: family.family_id,
+        },
+    ]);
 });
