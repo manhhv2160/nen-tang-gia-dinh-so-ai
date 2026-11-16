@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "status_code": 200,
+  "message": "OK",
+  "data": [
+    {
+      "branch_id": "1",
+      "family_id": "1",
+      "branch_name": "Nhánh trưởng",
+      "description": null
+    }
+  ]
+}
