@@ -1,44 +1,64 @@
-// Truy vấn bảng reaction. Ràng buộc UNIQUE (post_id, user_id) đảm bảo mỗi người một cảm xúc cho mỗi bài.
-import { Reaction } from '../models/Reaction.js';
+import pool from '../config/database.js';
 
-export class ReactionRepository {
-  constructor(db) {
-    this.db = db;
-  }
-
-  /** Cảm xúc của một bài, cũ nhất trước. Trả { rows, total }. */
-  async findByPost(postId, { limit = 50, offset = 0 } = {}) {
-    const [list, count] = await Promise.all([
-      this.db.query(
-        `SELECT * FROM reaction WHERE post_id = $1::bigint
-         ORDER BY created_at ASC, reaction_id ASC LIMIT $2 OFFSET $3`,
-        [postId, limit, offset],
-      ),
-      this.db.query('SELECT COUNT(*)::int AS n FROM reaction WHERE post_id = $1::bigint', [postId]),
-    ]);
-    return { rows: list.rows.map(Reaction.from), total: count.rows[0].n };
-  }
-
-  async findById(reactionId) {
-    const { rows } = await this.db.query('SELECT * FROM reaction WHERE reaction_id = $1::bigint', [reactionId]);
-    return Reaction.from(rows[0]);
-  }
-
-  /** Thêm mới hoặc đổi loại cảm xúc nếu người này đã thả trước đó. created = true nếu là bản ghi mới. */
-  async upsert({ postId, userId, reactionType }) {
-    const { rows } = await this.db.query(
-      `INSERT INTO reaction (post_id, user_id, reaction_type)
-       VALUES ($1::bigint, $2::bigint, $3)
-       ON CONFLICT (post_id, user_id)
-       DO UPDATE SET reaction_type = EXCLUDED.reaction_type, updated_at = now()
-       RETURNING *, (xmax = 0) AS created`,
-      [postId, userId, reactionType],
+export async function listByPost(postId) {
+    const result = await pool.query(
+        `SELECT * FROM reaction WHERE post_id = $1
+         ORDER BY created_at ASC, reaction_id ASC`,
+        [postId],
     );
-    return { reaction: Reaction.from(rows[0]), created: rows[0].created };
-  }
+    return result.rows;
+}
 
-  async remove(reactionId) {
-    const { rowCount } = await this.db.query('DELETE FROM reaction WHERE reaction_id = $1::bigint', [reactionId]);
-    return rowCount > 0;
-  }
-}// Repository: truy vấn SQL vào community_db
+export async function findByPostAndUser(postId, userId) {
+    const result = await pool.query(
+        'SELECT * FROM reaction WHERE post_id = $1 AND user_id = $2',
+        [postId, userId],
+    );
+    return result.rows[0] ?? null;
+}
+
+export async function findById(reactionId) {
+    const result = await pool.query('SELECT * FROM reaction WHERE reaction_id = $1', [reactionId]);
+    return result.rows[0] ?? null;
+}
+
+export async function create({ post_id, user_id, reaction_type }) {
+    const result = await pool.query(
+        `INSERT INTO reaction (post_id, user_id, reaction_type)
+         VALUES ($1, $2, $3) RETURNING *`,
+        [post_id, user_id, reaction_type],
+    );
+    return result.rows[0];
+}
+
+export async function update(reactionId, reactionType) {
+    const result = await pool.query(
+        `UPDATE reaction SET reaction_type = $1, updated_at = NOW()
+         WHERE reaction_id = $2 RETURNING *`,
+        [reactionType, reactionId],
+    );
+    return result.rows[0] ?? null;
+}
+
+export async function remove(reactionId) {
+    const result = await pool.query('DELETE FROM reaction WHERE reaction_id = $1 RETURNING reaction_id', [reactionId]);
+    return result.rowCount > 0;
+}
+
+/** Số lượng cảm xúc theo loại: { LIKE: 3, LOVE: 1, ... } (dùng cho /internal/stats - thẻ FMLCN-47). */
+export async function countByType(familyId) {
+    const values = [];
+    let where = '';
+    if (familyId) {
+        values.push(familyId);
+        where = 'WHERE p.family_id = $1';
+    }
+    const result = await pool.query(
+        `SELECT r.reaction_type, COUNT(*)::int AS count
+         FROM reaction r JOIN post p ON p.post_id = r.post_id
+         ${where}
+         GROUP BY r.reaction_type`,
+        values,
+    );
+    return Object.fromEntries(result.rows.map((row) => [row.reaction_type, row.count]));
+}
