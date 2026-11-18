@@ -21,10 +21,12 @@ app.get('/health', (req, res) => res.status(200).json({
 // 1. Khai báo route
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes'); // Đã thêm route user
+const internalRoutes = require('./routes/internal.routes');
 
 // 2. Sử dụng route (đặt trước chỗ app.listen hoặc export)
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes); // Đã đăng ký đường dẫn /api/users
+app.use('/internal', internalRoutes);
 
 // Middleware xử lý lỗi
 app.use((err, req, res, next) => {

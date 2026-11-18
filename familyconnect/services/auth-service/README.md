@@ -27,6 +27,8 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 | PATCH | `/internal/users/:id/role` | Đổi vai trò; genealogy dùng để nâng GUEST thành FAMILY_MEMBER sau xác minh |
 | GET | `/internal/stats` | Số liệu cho dashboard |
 
+Hai endpoint `/internal/users/:id` và `PATCH /internal/users/:id/role` được genealogy-service sử dụng. Endpoint đổi vai trò chỉ cho phép nâng `GUEST` lên `FAMILY_MEMBER`; tài khoản đã có vai trò cao hơn được giữ nguyên. Các route `/internal` chỉ được gắn trực tiếp trong auth-service, không định tuyến qua gateway.
+
 ## Gọi tới service khác
 - report (ghi nhật ký đăng ký, đăng nhập, đổi vai trò và xóa người dùng)
 

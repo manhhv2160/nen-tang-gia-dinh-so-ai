@@ -1,4 +1,5 @@
 import { Gender, Roles } from '../../../../shared/src/enums.js';
+import * as AuthClient from '../clients/AuthClient.js';
 import { sendAuditEvent } from '../clients/AuditClient.js';
 import * as BranchRepository from '../repositories/BranchRepository.js';
 import * as FamilyRepository from '../repositories/FamilyRepository.js';
@@ -164,6 +165,69 @@ export async function update(user, memberId, body) {
         familyId: member.family_id,
     });
     return updatedMember;
+}
+
+export async function linkUser(user, memberId, body) {
+    const member = await MemberRepository.findById(memberId);
+    if (!member) throw notFound('Member not found');
+    await assertFamilyAccess(user, member.family_id, Roles.FAMILY_ADMIN);
+    if (member.user_id !== null) throw conflict('Member is already linked to a user');
+
+    const userId = parseId(body?.user_id, 'user_id');
+    if (!(await AuthClient.getUserById(userId))) throw notFound('User not found');
+
+    try {
+        const linkedMember = await MemberRepository.linkUser(memberId, userId);
+        if (!linkedMember) throw conflict('Member is already linked to a user');
+        sendAuditEvent({
+            userId: user.userId,
+            action: 'UPDATE',
+            entityType: 'MEMBER',
+            entityId: memberId,
+            familyId: member.family_id,
+        });
+        return linkedMember;
+    } catch (error) {
+        if (error.code === '23505') throw conflict('User is already linked to a member in this family');
+        throw error;
+    }
+}
+
+export async function verify(user, memberId) {
+    const member = await MemberRepository.findById(memberId);
+    if (!member) throw notFound('Member not found');
+    await assertFamilyAccess(user, member.family_id, Roles.FAMILY_ADMIN);
+
+    let linkedUser = null;
+    if (member.user_id !== null) {
+        linkedUser = await AuthClient.getUserById(member.user_id);
+        if (!linkedUser) throw notFound('Linked user not found');
+    }
+
+    const verifiedMember = await MemberRepository.verify(memberId);
+    if (!verifiedMember) throw notFound('Member not found');
+
+    if (linkedUser?.role === Roles.GUEST) {
+        if (!(await AuthClient.promoteUserToFamilyMember(member.user_id))) {
+            throw notFound('Linked user not found');
+        }
+        sendAuditEvent({
+            userId: user.userId,
+            action: 'ROLE_CHANGE',
+            entityType: 'USER',
+            entityId: member.user_id,
+            familyId: member.family_id,
+        });
+    }
+
+    sendAuditEvent({
+        userId: user.userId,
+        action: 'VERIFY',
+        entityType: 'MEMBER',
+        entityId: memberId,
+        familyId: member.family_id,
+    });
+    return verifiedMember;
 }
 
 export async function remove(user, memberId) {

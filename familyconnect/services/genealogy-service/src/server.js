@@ -1,7 +1,6 @@
 import app from './app.js';
+import config from './config/index.js';
 
-const port = Number(process.env.PORT || 3002);
-
-app.listen(port, '0.0.0.0', () => {
-    console.log(`genealogy-service listening on port ${port}`);
+app.listen(config.port, '0.0.0.0', () => {
+    console.log(`genealogy-service listening on port ${config.port}`);
 });

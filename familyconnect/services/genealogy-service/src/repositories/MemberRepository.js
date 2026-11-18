@@ -82,6 +82,26 @@ export async function update(memberId, changes) {
     return result.rows[0] ?? null;
 }
 
+export async function linkUser(memberId, userId) {
+    const result = await pool.query(
+        `UPDATE member SET user_id = $1, updated_at = NOW()
+         WHERE member_id = $2 AND user_id IS NULL
+         RETURNING *`,
+        [userId, memberId],
+    );
+    return result.rows[0] ?? null;
+}
+
+export async function verify(memberId) {
+    const result = await pool.query(
+        `UPDATE member SET is_verified = TRUE, updated_at = NOW()
+         WHERE member_id = $1
+         RETURNING *`,
+        [memberId],
+    );
+    return result.rows[0] ?? null;
+}
+
 export async function remove(memberId) {
     const result = await pool.query('DELETE FROM member WHERE member_id = $1 RETURNING member_id', [memberId]);
     return result.rowCount > 0;

@@ -21,6 +21,16 @@ export async function update(req, res) {
     return ApiResponse.ok(res, member, 'Member updated');
 }
 
+export async function linkUser(req, res) {
+    const member = await MemberService.linkUser(req.user, parseId(req.params.id), req.body);
+    return ApiResponse.ok(res, member, 'User linked to member');
+}
+
+export async function verify(req, res) {
+    const member = await MemberService.verify(req.user, parseId(req.params.id));
+    return ApiResponse.ok(res, member, 'Member verified');
+}
+
 export async function remove(req, res) {
     await MemberService.remove(req.user, parseId(req.params.id));
     return res.status(200).json({ success: true, status_code: 200, message: 'Member deleted', data: null });

@@ -1,4 +1,4 @@
-const reportUrl = (process.env.REPORT_URL || 'http://localhost:3007').replace(/\/$/, '');
+import config from '../config/index.js';
 
 export function sendAuditEvent({ userId, action, entityType, entityId, familyId }) {
     const body = {
@@ -9,7 +9,7 @@ export function sendAuditEvent({ userId, action, entityType, entityId, familyId 
         family_id: familyId ?? null,
     };
 
-    void fetch(`${reportUrl}/internal/audit`, {
+    void fetch(`${config.reportUrl}/internal/audit`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),

@@ -7,6 +7,8 @@ const router = Router();
 
 router.get('/', requireRole(Roles.FAMILY_MEMBER), MemberController.list);
 router.post('/', requireRole(Roles.FAMILY_ADMIN), MemberController.create);
+router.post('/:id/link-user', requireRole(Roles.FAMILY_ADMIN), MemberController.linkUser);
+router.post('/:id/verify', requireRole(Roles.FAMILY_ADMIN), MemberController.verify);
 router.get('/:id', requireRole(Roles.FAMILY_MEMBER), MemberController.get);
 router.patch('/:id', requireRole(Roles.FAMILY_ADMIN), MemberController.update);
 router.delete('/:id', requireRole(Roles.FAMILY_ADMIN), MemberController.remove);

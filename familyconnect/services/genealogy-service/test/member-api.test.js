@@ -6,6 +6,7 @@ import app from '../src/app.js';
 const members = new Map();
 const families = new Map();
 const branches = new Map();
+const authUsers = new Map();
 const originalQuery = pool.query.bind(pool);
 const originalFetch = globalThis.fetch;
 const auditEvents = [];
@@ -14,9 +15,31 @@ let baseUrl;
 
 before(async () => {
     globalThis.fetch = (input, options) => {
-        if (new URL(String(input)).pathname === '/internal/audit') {
+        const url = new URL(String(input));
+        if (url.pathname === '/internal/audit') {
             auditEvents.push(JSON.parse(options.body));
             return new Promise(() => {});
+        }
+        const authUserRoute = url.pathname.match(/^\/internal\/users\/(\d+)(\/role)?$/);
+        if (authUserRoute) {
+            const user = authUsers.get(authUserRoute[1]);
+            if (!user) {
+                return Promise.resolve(new Response(JSON.stringify({
+                    success: false,
+                    status_code: 404,
+                    message: 'User not found',
+                    data: { code: 'NOT_FOUND' },
+                }), { status: 404, headers: { 'content-type': 'application/json' } }));
+            }
+            if (authUserRoute[2] && options.method === 'PATCH' && user.role === 'GUEST') {
+                user.role = JSON.parse(options.body).role;
+            }
+            return Promise.resolve(new Response(JSON.stringify({
+                success: true,
+                status_code: 200,
+                message: 'OK',
+                data: user,
+            }), { status: 200, headers: { 'content-type': 'application/json' } }));
         }
         return originalFetch(input, options);
     };
@@ -118,6 +141,25 @@ before(async () => {
         if (sql.startsWith('SELECT 1 FROM member WHERE user_id = $1 AND family_id = $2')) {
             return { rows: [], rowCount: 0 };
         }
+        if (sql.startsWith('UPDATE member SET user_id = $1')) {
+            const member = members.get(values[1]);
+            if (!member || member.user_id !== null) return { rows: [], rowCount: 0 };
+            const alreadyLinked = [...members.values()].some((candidate) =>
+                candidate.member_id !== member.member_id
+                && candidate.family_id === member.family_id
+                && candidate.user_id === values[0]);
+            if (alreadyLinked) throw Object.assign(new Error('duplicate link'), { code: '23505' });
+            member.user_id = values[0];
+            member.updated_at = new Date().toISOString();
+            return { rows: [member], rowCount: 1 };
+        }
+        if (sql.startsWith('UPDATE member SET is_verified = TRUE')) {
+            const member = members.get(values[0]);
+            if (!member) return { rows: [], rowCount: 0 };
+            member.is_verified = true;
+            member.updated_at = new Date().toISOString();
+            return { rows: [member], rowCount: 1 };
+        }
         if (sql.startsWith('UPDATE member SET')) {
             const member = members.get(values.at(-1));
             if (!member) return { rows: [], rowCount: 0 };
@@ -210,6 +252,52 @@ test('member API creates, reads, updates and deletes a member', async () => {
             family_id: '1',
         },
     ]);
+});
+
+test('member API links an existing auth user and verification promotes GUEST', async () => {
+    const memberId = '90031';
+    const authUser = {
+        user_id: '42',
+        email: 'linked@example.test',
+        full_name: 'Linked User',
+        role: 'GUEST',
+    };
+    const auditStart = auditEvents.length;
+    authUsers.set(authUser.user_id, authUser);
+    members.set(memberId, {
+        member_id: memberId,
+        family_id: '1',
+        branch_id: null,
+        user_id: null,
+        full_name: 'Linked Member',
+        gender: 'OTHER',
+        is_verified: false,
+    });
+
+    const missingUserResponse = await request(`/api/members/${memberId}/link-user`, 'POST', {
+        user_id: '99999',
+    });
+    assert.equal(missingUserResponse.status, 404);
+    assert.equal(members.get(memberId).user_id, null);
+
+    const linkResponse = await request(`/api/members/${memberId}/link-user`, 'POST', {
+        user_id: authUser.user_id,
+    });
+    assert.equal(linkResponse.status, 200);
+    assert.equal((await linkResponse.json()).data.user_id, authUser.user_id);
+
+    const verifyResponse = await request(`/api/members/${memberId}/verify`, 'POST');
+    assert.equal(verifyResponse.status, 200);
+    assert.equal((await verifyResponse.json()).data.is_verified, true);
+    assert.equal(authUser.role, 'FAMILY_MEMBER');
+    assert.deepEqual(auditEvents.slice(auditStart).map(({ action, entity_type }) => [action, entity_type]), [
+        ['UPDATE', 'MEMBER'],
+        ['ROLE_CHANGE', 'USER'],
+        ['VERIFY', 'MEMBER'],
+    ]);
+
+    members.delete(memberId);
+    authUsers.delete(authUser.user_id);
 });
 
 test('internal memberships returns every family linked to the requested user', async () => {
