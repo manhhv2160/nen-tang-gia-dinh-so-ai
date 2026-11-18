@@ -1,33 +1,36 @@
-// Class App: gắn middleware, route công khai, GET /health, xử lý lỗi. (Route /internal thêm ở thẻ 47.)
-// Gateway đổi /api/v1/<tài nguyên> thành /api/<tài nguyên> rồi chuyển tới đây, nên route công khai nằm dưới /api.
 import express from 'express';
-import { ApiResponse, AppError, registerHealthRoute } from './shared.js';
-import { postRoutes } from './routes/post.routes.js';
-import { commentRoutes } from './routes/comment.routes.js';
-import { reactionRoutes } from './routes/reaction.routes.js';
+import { ApiResponse } from '../../../shared/src/ApiResponse.js';
+import { AppError } from '../../../shared/src/AppError.js';
+import { userContext } from '../../../shared/src/userContext.js';
+import { registerHealthRoute } from '../../../shared/src/healthRoute.js';
+import postRoutes from './routes/post.routes.js';
+import commentRoutes from './routes/comment.routes.js';
+import reactionRoutes from './routes/reaction.routes.js';
+import internalRoutes from './routes/internal.routes.js';
 
-export class App {
-  constructor({ postController, commentController, reactionController, serviceName = 'community-service' }) {
-    this.express = express();
-    const app = this.express;
-    app.disable('x-powered-by');
-    // Gateway không đọc body (không dùng express.json), nên service tự đọc JSON ở đây.
-    app.use(express.json({ limit: '100kb' }));
+const app = express();
 
-    registerHealthRoute(app, serviceName);
-    app.use('/api/posts', postRoutes(postController));
-    app.use('/api/comments', commentRoutes(commentController));
-    app.use('/api/reactions', reactionRoutes(reactionController));
+app.use(express.json({ limit: '1mb' }));
+app.use(userContext);
+registerHealthRoute(app, 'community-service');
+app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/reactions', reactionRoutes);
+app.use('/internal', internalRoutes);
 
-    app.use((req, res) => ApiResponse.fromError(res, AppError.notFound('Route not found')));
-    // eslint-disable-next-line no-unused-vars
-    app.use((err, req, res, next) => ApiResponse.fromError(res, App.#translate(err)));
-  }
+app.use((req, res, next) => next(new AppError(404, 'Route not found', { code: 'NOT_FOUND' })));
+app.use((error, req, res, next) => {
+    if (res.headersSent) return next(error);
+    if (error.status === 400 && error.type === 'entity.parse.failed') {
+        return ApiResponse.error(res, 400, 'Validation failed', {
+            code: 'VALIDATION_ERROR',
+            fields: { body: 'must contain valid JSON' },
+        });
+    }
+    if (error.type === 'entity.too.large') {
+        return ApiResponse.error(res, 413, 'Payload too large', { code: 'PAYLOAD_TOO_LARGE' });
+    }
+    return ApiResponse.fromError(res, error);
+});
 
-  /** Đổi lỗi của body-parser (JSON sai, body quá lớn) thành AppError để trả đúng khuôn response chung. */
-  static #translate(err) {
-    if (err?.type === 'entity.parse.failed') return AppError.validation({ body: 'invalid JSON' });
-    if (err?.type === 'entity.too.large') return AppError.payloadTooLarge();
-    return err;
-  }
-}
+export default app;
