@@ -1,0 +1,10 @@
+import { AppError } from '../../../shared/src/AppError.js';
+export function invalid(field, reason='invalid value') { throw new AppError(400,'Validation failed',{code:'VALIDATION_ERROR',fields:{[field]:reason}}); }
+export function id(value,field='id') { if(typeof value!=='string'|| !/^\d{1,19}$/.test(value)|| BigInt(value)<=0n || BigInt(value)>9223372036854775807n) invalid(field); return value; }
+export function str(value,field,max=255,required=false) { if(value==null||value==='') {if(required) invalid(field,'required');return null;} if(typeof value!=='string'|| value.trim().length>max) invalid(field); if(required&&!value.trim())invalid(field,'required'); return value.trim()||null; }
+export function choice(value,field,values) { if(!values.includes(value))invalid(field); return value; }
+export function date(value,field,required=false){if(value==null||value===''){if(required)invalid(field,'required');return null;} if(typeof value!=='string'||!Number.isFinite(Date.parse(value)))invalid(field);return new Date(value).toISOString();}
+export function pagination(q){const limit=Number(q.limit??50),offset=Number(q.offset??0);if(!Number.isInteger(limit)||limit<1||limit>100)invalid('limit');if(!Number.isSafeInteger(offset)||offset<0)invalid('offset');return [limit,offset];}
+export function missing(){throw new AppError(404,'Resource not found',{code:'NOT_FOUND'});}
+export function send(res,data,status=200){return res.status(status).json({success:true,status_code:status,message:status===201?'Created':'OK',data});}
+export function errorHandler(err,req,res,next){if(res.headersSent)return next(err);if(err instanceof AppError)return res.status(err.statusCode).json({success:false,status_code:err.statusCode,message:err.message,data:err.data});if(err.code==='23514'||err.code==='22P02'||err.type==='entity.parse.failed')return res.status(400).json({success:false,status_code:400,message:'Validation failed',data:{code:'VALIDATION_ERROR',fields:{}}});console.error(err);return res.status(500).json({success:false,status_code:500,message:'Internal error',data:{code:'INTERNAL_ERROR'}});}

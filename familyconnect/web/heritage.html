@@ -11,25 +11,22 @@
 <aside class="sidebar" id="sidebar"></aside>
 <main class="main">
 <div class="page-head"><h1>Di sản số</h1></div>
-<details class="card"><summary>Thêm tài liệu di sản</summary>
+<label for="family-select">Dòng họ</label><select id="family-select"></select><p id="notice" role="alert"></p>
+<details class="card" id="record-form"><summary>Thêm tài liệu di sản</summary>
   <div class="form-grid">
     <div><label for="h-type">Loại tài liệu</label><select id="h-type" data-enum="HeritageTypes"></select></div>
     <div><label for="h-title">Tiêu đề</label><input id="h-title"></div>
     <div><label for="h-file">Tệp đính kèm</label><input id="h-file" type="file"></div>
   </div>
   <label for="h-content">Nội dung</label><textarea id="h-content" rows="3"></textarea>
-  <p><button type="button" class="btn">Lưu tài liệu</button></p>
+  <p><button type="button" class="btn" id="save-record">Lưu</button> <button type="button" class="btn" id="cancel-record">Hủy</button></p>
 </details>
-<p class="row" data-enum-pills="HeritageTypes"></p>
-<section class="grid">
-  <article class="card"><div class="thumb">Bản scan</div><span class="badge" data-enum-label="HeritageTypes" data-value="HISTORICAL_DOC">Tài liệu lịch sử</span><h2>Gia phả bản chép tay 1920</h2><p class="muted">Tài liệu gốc ghi lại bốn đời đầu của dòng họ.</p></article>
-  <article class="card"><div class="thumb">Câu chuyện</div><span class="badge" data-enum-label="HeritageTypes" data-value="STORY">Câu chuyện</span><h2>Ngày về quê đất mới</h2><p class="muted">Kể lại cuộc di cư của ông cố vào Nam.</p></article>
-  <article class="card"><div class="thumb">Chân dung</div><span class="badge ok" data-enum-label="HeritageTypes" data-value="OUTSTANDING_MEMBER">Thành viên tiêu biểu</span><h2>Nguyễn Văn An</h2><p class="muted">Người sáng lập nhánh trưởng, nhà giáo.</p></article>
-  <article class="card"><div class="thumb">Ảnh</div><span class="badge" data-enum-label="HeritageTypes" data-value="PHOTO">Ảnh</span><h2>Họp mặt năm 1995</h2><p class="muted">Ảnh chụp tại nhà thờ họ.</p></article>
-</section>
+<section class="grid" id="records"></section>
+
 </main>
 </div>
 <script src="src/components/Layout.js"></script>
 <script type="module" src="src/components/EnumBinder.js"></script>
+<script type="module" src="src/controllers/EventHeritageController.js"></script>
 </body>
 </html>
