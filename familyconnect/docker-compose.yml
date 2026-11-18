@@ -71,7 +71,7 @@ services:
       - db
       - report-service
 
-  community-service:
+    community-service:
     build:
       context: .
       dockerfile: services/community-service/Dockerfile
@@ -79,7 +79,7 @@ services:
       PORT: 3003
       DATABASE_URL: postgres://community_svc:community_dev_pw@db:5432/community_db
       GENEALOGY_URL: http://genealogy-service:3002
-    depends_on:
+      REPORT_URL: http://report-service:3007
       - db
 
   event-service:
