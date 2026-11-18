@@ -70,11 +70,14 @@ TEST_DATABASE_URL=postgres://user:pass@localhost:5432/community_test npm test   
 ```
 
 ## Danh sách việc
-- [x] Model và bảng trong `db/init`
-- [x] Repository, Service, Controller, Route (CRUD bài đăng, bình luận, cảm xúc)
-- [x] `GET /health`
-- [ ] Endpoint `/internal/stats` và `/internal/activity` (thẻ FMLCN-47)
-- [x] Phân quyền theo header `X-User-Role` (xem docs/conventions.md)
-- [x] Cập nhật bảng endpoint trong README này (docs/api-contract.md đã có sẵn mục community)
-- [ ] Gửi nhật ký thao tác cho report-service (thẻ FMLCN-48)
-- [ ] Trang `feed.html` và các lớp frontend (thẻ FMLCN-46)
+- [x] Model và bảng trong `db/init` (FMLCN-46)
+- [x] Repository, Service, Controller, Route (FMLCN-46)
+- [ ] Endpoint `/internal` (`/internal/stats`, `/internal/activity`) — thẻ FMLCN-47; `GET /health` đã có
+- [x] Phân quyền theo header `X-User-Role` + membership của dòng họ (FMLCN-46)
+- [ ] Cập nhật bảng endpoint trong README này và docs/api-contract.md
+
+## Ghi chú phân quyền (FMLCN-46)
+- Mọi endpoint cần `FAMILY_MEMBER` trở lên (`shared/src/requireRole.js`).
+- Người gọi phải có membership ở `genealogy-service` (`GET /internal/memberships?user_id=`); kết quả cache 30 giây.
+- `SYSTEM_ADMIN` bỏ qua kiểm tra membership nhưng vẫn phải có `X-User-Id` hợp lệ.
+- `PATCH`/`DELETE` bài và bình luận chỉ tác giả (hoặc `SYSTEM_ADMIN`); cảm xúc chỉ người đã thả được xóa.
