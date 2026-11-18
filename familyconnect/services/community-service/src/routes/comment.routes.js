@@ -1,14 +1,14 @@
-// Route bình luận và phân quyền (gateway: /api/v1/comments -> /api/comments).
+// Khai báo route comment và phân quyền (dòng họ lấy theo bài viết).
 import { Router } from 'express';
-import { Roles, requireRole } from '../shared.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
+import { Roles } from '../../../../shared/src/enums.js';
+import { requireRole } from '../../../../shared/src/requireRole.js';
+import * as CommentController from '../controllers/CommentController.js';
 
-export function commentRoutes(controller) {
-  const router = Router();
-  const member = requireRole(Roles.FAMILY_MEMBER);
-  router.get('/', member, asyncHandler(controller.list));
-  router.post('/', member, asyncHandler(controller.create));
-  router.patch('/:id', member, asyncHandler(controller.update));
-  router.delete('/:id', member, asyncHandler(controller.remove));
-  return router;
-}// Khai báo route comment và phân quyền
+const router = Router();
+
+router.get('/', requireRole(Roles.FAMILY_MEMBER), CommentController.list);
+router.post('/', requireRole(Roles.FAMILY_MEMBER), CommentController.create);
+router.patch('/:id', requireRole(Roles.FAMILY_MEMBER), CommentController.update);
+router.delete('/:id', requireRole(Roles.FAMILY_MEMBER), CommentController.remove);
+
+export default router;
