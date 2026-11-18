@@ -1,14 +1,6 @@
-import pg from 'pg';
-import config from './index.js';
+import { AppError } from '../../../../shared/src/AppError.js';
 
-const { Pool } = pg;
-
-const pool = new Pool({
-    connectionString: config.databaseUrl,
-});
-
-pool.on('error', (error) => {
-    console.error('[community-service] Unexpected database pool error:', error);
-});
-
-export default pool;// Kết nối PostgreSQL, chỉ vào community_db
+export const unauthorized = () => new AppError(401, 'Authentication required', { code: 'UNAUTHENTICATED' });
+export const forbidden = (message = 'Forbidden') => new AppError(403, message, { code: 'FORBIDDEN' });
+export const notFound = (message = 'Resource not found') => new AppError(404, message, { code: 'NOT_FOUND' });
+export const conflict = (message = 'Resource already exists') => new AppError(409, message, { code: 'CONFLICT' });
