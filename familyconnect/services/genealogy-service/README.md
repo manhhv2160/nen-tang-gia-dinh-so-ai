@@ -46,8 +46,29 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 ## Đã triển khai
 - Schema PostgreSQL cho `family`, `branch`, `member`, `parent_child_relationship`, `marriage`.
 - CRUD dòng họ, nhánh và thành viên theo API ở trên; danh sách hỗ trợ phân trang, lọc và `X-Total-Count`.
+- CRUD quan hệ cha-con, hôn nhân; truy vấn quan hệ và dựng cây gia phả.
 - Phân quyền theo `X-User-Id`, `X-User-Role` và tư cách thành viên trong dòng họ.
 - Nhật ký audit `CREATE`, `UPDATE`, `DELETE` cho dòng họ, nhánh, thành viên, quan hệ và hôn nhân.
 - `GET /health`.
 
-Các endpoint quan hệ, hôn nhân, cây gia phả, liên kết/xác minh tài khoản và `/internal` vẫn cần được triển khai riêng.
+Liên kết/xác minh tài khoản và một số endpoint `/internal` vẫn cần được hoàn thiện riêng.
+
+## Dữ liệu mẫu cho Docker
+
+`db/seed/genealogy-sample.sql` tạo một dòng họ mẫu gồm 3 chi họ, 15 thành viên qua 3 thế hệ, quan hệ cha-con (có cả `ADOPTED`) và các trạng thái hôn nhân `MARRIED`, `DIVORCED`, `WIDOWED`. Script có thể chạy lại mà không thêm bản ghi trùng.
+
+Nếu database `genealogy_db` chưa có bảng, áp dụng schema vào đúng database trước (dùng schema hiện tại trong `db/init/20-genealogy.sql`). File hiện tại không có lệnh `\connect`, nên bước này cần thiết khi khởi tạo database rỗng để bảo đảm schema được tạo trong `genealogy_db`, không phải database mặc định `postgres`. Chạy các lệnh từ thư mục `familyconnect`:
+
+```powershell
+$OutputEncoding = New-Object System.Text.UTF8Encoding
+Get-Content -Raw .\db\init\20-genealogy.sql | docker compose exec -T db psql -1 -v ON_ERROR_STOP=1 -U genealogy_svc -d genealogy_db
+```
+
+Sau đó nạp dữ liệu mẫu. Tham số `sample_user_id` nên là ID của tài khoản SYSTEM_ADMIN trong `auth_db` (kiểm tra bằng `SELECT user_id, email FROM users;`):
+
+```powershell
+$OutputEncoding = New-Object System.Text.UTF8Encoding
+Get-Content -Raw .\db\seed\genealogy-sample.sql | docker compose exec -T db psql -v ON_ERROR_STOP=1 -v sample_user_id=2 -U genealogy_svc -d genealogy_db
+```
+
+Các endpoint có thể thử qua gateway: `/api/v1/families`, `/api/v1/branches?family_id=<id>`, `/api/v1/members?family_id=<id>`, `/api/v1/relationships?member_id=<id>`, `/api/v1/marriages?member_id=<id>` và `/api/v1/tree?family_id=<id>`. Đăng nhập bằng tài khoản admin mặc định để lấy Bearer token. Dữ liệu seed không liên kết thành viên với tài khoản người dùng.
