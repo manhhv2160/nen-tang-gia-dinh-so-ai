@@ -1,30 +1,36 @@
 const rateLimit = require('express-rate-limit');
 
-// Giới hạn request chung (100 request / 15 phút)
+const rateLimitResponse = (message) => ({
+    success: false,
+    status_code: 429,
+    message,
+    data: { code: 'RATE_LIMITED' }
+});
+
+// Giới hạn API công khai theo hợp đồng: 300 request mỗi phút trên mỗi IP.
 const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, 
-    max: 100, 
+    windowMs: 60 * 1000,
+    limit: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
     handler: (req, res) => {
-        res.status(429).json({
-            success: false,
-            status_code: 429,
-            message: 'Bạn đã gửi quá nhiều yêu cầu, vui lòng thử lại sau 15 phút',
-            data: null
-        });
+        res.status(429).json(rateLimitResponse(
+            'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.'
+        ));
     }
 });
 
-// Giới hạn đăng nhập sai (khóa 5 phút nếu sai 5 lần)
+// Chỉ tính các lần đăng nhập thất bại; phản hồi thành công không bị tính.
 const loginLimiter = rateLimit({
-    windowMs: 5 * 60 * 1000, 
-    max: 5, 
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    skipSuccessfulRequests: true,
+    standardHeaders: true,
+    legacyHeaders: false,
     handler: (req, res) => {
-        res.status(429).json({
-            success: false,
-            status_code: 429,
-            message: 'Đăng nhập sai quá nhiều lần. Vui lòng đợi 5 phút trước khi thử lại.',
-            data: null
-        });
+        res.status(429).json(rateLimitResponse(
+            'Bạn đã đăng nhập thất bại quá nhiều lần. Vui lòng thử lại sau 15 phút.'
+        ));
     }
 });
 

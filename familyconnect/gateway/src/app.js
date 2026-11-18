@@ -6,7 +6,7 @@ const path = require('path');
 const { verifyToken } = require('./middleware/auth.js');
 const { setupProxies, setupHealthProxies } = require('./proxy/index.js');
 const requestLogger = require('./middleware/requestLogger.js');
-const { apiLimiter } = require('./middleware/rateLimiter.js');
+const { apiLimiter, loginLimiter } = require('./middleware/rateLimiter.js');
 const errorHandler = require('./middleware/errorHandler.js');
 
 const app = express();
@@ -16,8 +16,9 @@ app.use(cors());
 // 1. Thêm requestLogger theo yêu cầu của Bảo
 app.use(requestLogger);
 
-// 2. Thêm giới hạn request chung (chống spam)
-app.use(apiLimiter);
+// Chỉ giới hạn API; không tính static files hay health checks.
+app.use('/api', apiLimiter);
+app.use('/api/v1/auth/login', loginLimiter);
 
 // Phục vụ thư mục web (frontend) tĩnh
 app.use(express.static(path.join(__dirname, '../../web')));

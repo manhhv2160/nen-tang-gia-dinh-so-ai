@@ -87,9 +87,9 @@ Khi nhà cung cấp AI lỗi, `ai-service` trả 503 với `code` là `AI_UNAVAI
 
 ### 2.7 Giới hạn tốc độ
 
-- Đăng nhập sai: tối đa 10 lần trong 15 phút theo IP, vượt thì 429.
+- Đăng nhập thất bại: tối đa 10 lần trong 15 phút theo IP; đăng nhập thành công không tính vào giới hạn, vượt thì 429.
 - `/ai/*`: tối đa 20 request mỗi phút cho mỗi người dùng.
-- Các route còn lại: 300 request mỗi phút cho mỗi IP.
+- API còn lại: 300 request mỗi phút cho mỗi IP. Tệp tĩnh và endpoint health không tính vào giới hạn này.
 
 ### 2.8 Phiên bản
 
