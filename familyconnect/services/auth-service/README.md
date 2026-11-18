@@ -35,6 +35,7 @@ Hai endpoint `/internal/users/:id` và `PATCH /internal/users/:id/role` được
 ## Danh sách việc
 - [ ] Model và bảng trong `db/init`
 - [ ] Repository, Service, Controller, Route
-- [ ] Endpoint `/internal` và `GET /health`
+- [x] `GET /health`, `GET /internal/users/:id`, `PATCH /internal/users/:id/role`
+- [ ] `GET /internal/users?ids=` và `GET /internal/stats`
 - [ ] Phân quyền theo header `X-User-Role` (xem docs/conventions.md)
 - [ ] Cập nhật bảng endpoint trong README này và docs/api-contract.md
