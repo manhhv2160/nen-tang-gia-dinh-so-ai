@@ -1,22 +1,28 @@
-// Controller bài đăng: nhận request, gọi PostService, trả ApiResponse.
-// Danh tính nằm ở req.user (do requireRole gắn từ header X-User-Id, X-User-Role).
-import { ApiResponse } from '../shared.js';
+import { ApiResponse } from '../../../../shared/src/ApiResponse.js';
+import * as PostService from '../services/PostService.js';
+import { parseId } from '../utils/validation.js';
 
-export class PostController {
-  constructor(postService) {
-    this.service = postService;
-  }
+export async function list(req, res) {
+    const { rows, total } = await PostService.list(req.user, req.query);
+    res.set('X-Total-Count', String(total));
+    return ApiResponse.ok(res, rows);
+}
 
-  list = async (req, res) => {
-    const { rows, total } = await this.service.list(req.user, req.query);
-    return ApiResponse.list(res, rows, total);
-  };
+export async function get(req, res) {
+    return ApiResponse.ok(res, await PostService.get(req.user, parseId(req.params.id)));
+}
 
-  get = async (req, res) => ApiResponse.ok(res, await this.service.get(req.user, req.params.id));
+export async function create(req, res) {
+    const post = await PostService.create(req.user, req.body);
+    return ApiResponse.created(res, post, 'Post created');
+}
 
-  create = async (req, res) => ApiResponse.created(res, await this.service.create(req.user, req.body));
+export async function update(req, res) {
+    const post = await PostService.update(req.user, parseId(req.params.id), req.body);
+    return ApiResponse.ok(res, post, 'Post updated');
+}
 
-  update = async (req, res) => ApiResponse.ok(res, await this.service.update(req.user, req.params.id, req.body));
-
-  remove = async (req, res) => ApiResponse.ok(res, await this.service.remove(req.user, req.params.id), 'Deleted');
-}// Controller: nhận request, gọi service, trả ApiResponse
+export async function remove(req, res) {
+    await PostService.remove(req.user, parseId(req.params.id));
+    return res.status(200).json({ success: true, status_code: 200, message: 'Post deleted', data: null });
+}
