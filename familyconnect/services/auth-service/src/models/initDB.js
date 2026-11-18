@@ -12,12 +12,8 @@ const createUsersTable = async () => {
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     `;
-    try {
-        await pool.query(query);
-        console.log('✅ Đã kiểm tra/tạo bảng "users" trong Database thành công');
-    } catch (err) {
-        console.error('❌ Lỗi khi tạo bảng users:', err.message);
-    }
+    await pool.query(query);
+    console.log('✅ Đã kiểm tra/tạo bảng "users" trong Database thành công');
 };
 
 module.exports = createUsersTable;
