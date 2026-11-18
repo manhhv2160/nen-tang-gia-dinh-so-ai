@@ -43,6 +43,17 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 - auth (tra cứu tài khoản, nâng GUEST thành FAMILY_MEMBER khi xác minh)
 - report (gửi `POST /internal/audit` không chờ phản hồi sau mỗi thao tác tạo, sửa, xóa)
 
+## Cấu hình runtime
+
+`src/config/index.js` đọc và kiểm tra cấu hình dùng chung:
+
+- `PORT` (mặc định `3002`, phải nằm trong khoảng 1–65535).
+- `DATABASE_URL` (mặc định kết nối PostgreSQL cục bộ cho phát triển).
+- `REPORT_URL` (mặc định `http://localhost:3007`, được `AuditClient` sử dụng).
+- `AUTH_URL` (mặc định `http://localhost:3001`, dành cho tích hợp auth; `AuthClient` hiện chưa được triển khai).
+
+URL service được bỏ dấu `/` ở cuối để ghép endpoint nhất quán.
+
 ## Đã triển khai
 - Schema PostgreSQL cho `family`, `branch`, `member`, `parent_child_relationship`, `marriage`.
 - CRUD dòng họ, nhánh và thành viên theo API ở trên; danh sách hỗ trợ phân trang, lọc và `X-Total-Count`.
@@ -51,7 +62,7 @@ Không đọc bảng của service khác và không có khóa ngoại sang servi
 - Nhật ký audit `CREATE`, `UPDATE`, `DELETE` cho dòng họ, nhánh, thành viên, quan hệ và hôn nhân.
 - `GET /health`.
 
-Liên kết/xác minh tài khoản và một số endpoint `/internal` vẫn cần được hoàn thiện riêng.
+Liên kết tài khoản thành viên và xác minh thành viên đã được triển khai; xác minh sẽ nâng tài khoản liên kết từ `GUEST` lên `FAMILY_MEMBER`. Một số endpoint `/internal` khác vẫn cần được hoàn thiện riêng.
 
 ## Dữ liệu mẫu cho Docker
 

@@ -1,9 +1,10 @@
 import pg from 'pg';
+import config from './index.js';
 
 const { Pool } = pg;
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgres://genealogy_svc:genealogy_dev_pw@localhost:5432/genealogy_db',
+    connectionString: config.databaseUrl,
 });
 
 pool.on('error', (error) => {
