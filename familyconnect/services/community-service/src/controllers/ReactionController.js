@@ -1,21 +1,19 @@
-// Controller cảm xúc: nhận request, gọi ReactionService, trả ApiResponse.
-import { ApiResponse } from '../shared.js';
+import { ApiResponse } from '../../../../shared/src/ApiResponse.js';
+import * as ReactionService from '../services/ReactionService.js';
+import { parseId } from '../utils/validation.js';
 
-export class ReactionController {
-  constructor(reactionService) {
-    this.service = reactionService;
-  }
+export async function list(req, res) {
+    return ApiResponse.ok(res, await ReactionService.list(req.user, req.query));
+}
 
-  list = async (req, res) => {
-    const { rows, total } = await this.service.listByPost(req.user, req.query);
-    return ApiResponse.list(res, rows, total);
-  };
+export async function setReaction(req, res) {
+    const { reaction, created } = await ReactionService.setReaction(req.user, req.body);
+    return created
+        ? ApiResponse.created(res, reaction, 'Reaction created')
+        : ApiResponse.ok(res, reaction, 'Reaction updated');
+}
 
-  /** 201 khi là cảm xúc mới, 200 khi người này đổi loại cảm xúc của chính họ. */
-  react = async (req, res) => {
-    const { reaction, created } = await this.service.react(req.user, req.body);
-    return created ? ApiResponse.created(res, reaction) : ApiResponse.ok(res, reaction, 'Updated');
-  };
-
-  remove = async (req, res) => ApiResponse.ok(res, await this.service.remove(req.user, req.params.id), 'Deleted');
-}// Controller: nhận request, gọi service, trả ApiResponse
+export async function remove(req, res) {
+    await ReactionService.remove(req.user, parseId(req.params.id));
+    return res.status(200).json({ success: true, status_code: 200, message: 'Reaction deleted', data: null });
+}
