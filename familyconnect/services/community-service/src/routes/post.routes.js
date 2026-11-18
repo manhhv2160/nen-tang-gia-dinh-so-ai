@@ -1,16 +1,16 @@
-// Route bài đăng và phân quyền. Gateway đổi /api/v1/posts thành /api/posts.
-// Mọi thao tác cần FAMILY_MEMBER trở lên (khách chưa được xác minh không xem được dữ liệu gia đình).
+// Khai báo route post và phân quyền: mọi thao tác cần FAMILY_MEMBER trở lên;
+// quyền theo dòng họ và quyền "chính tác giả" kiểm tra ở PostService.
 import { Router } from 'express';
-import { Roles, requireRole } from '../shared.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
+import { Roles } from '../../../../shared/src/enums.js';
+import { requireRole } from '../../../../shared/src/requireRole.js';
+import * as PostController from '../controllers/PostController.js';
 
-export function postRoutes(controller) {
-  const router = Router();
-  const member = requireRole(Roles.FAMILY_MEMBER);
-  router.get('/', member, asyncHandler(controller.list));
-  router.get('/:id', member, asyncHandler(controller.get));
-  router.post('/', member, asyncHandler(controller.create));
-  router.patch('/:id', member, asyncHandler(controller.update));
-  router.delete('/:id', member, asyncHandler(controller.remove));
-  return router;
-}// Khai báo route post và phân quyền
+const router = Router();
+
+router.get('/', requireRole(Roles.FAMILY_MEMBER), PostController.list);
+router.post('/', requireRole(Roles.FAMILY_MEMBER), PostController.create);
+router.get('/:id', requireRole(Roles.FAMILY_MEMBER), PostController.get);
+router.patch('/:id', requireRole(Roles.FAMILY_MEMBER), PostController.update);
+router.delete('/:id', requireRole(Roles.FAMILY_MEMBER), PostController.remove);
+
+export default router;
