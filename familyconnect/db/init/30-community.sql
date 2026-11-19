@@ -39,5 +39,4 @@ CREATE TABLE reaction (
     UNIQUE (post_id, user_id)
 );
 
-CREATE INDEX reaction_post_idx ON reaction (post_id);-- Schema của community-service (database community_db). Bảng: post, comment, reaction.
--- Khi viết: bắt đầu bằng \connect community_db community_svc ; ID dùng BIGINT, không có khóa ngoại sang bảng của service khác.
+CREATE INDEX reaction_post_idx ON reaction (post_id);
