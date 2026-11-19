@@ -1,7 +1,11 @@
-// Khai báo route nội bộ /internal/... (gateway không công khai).
-// GET /internal/stats và /internal/activity thuộc thẻ FMLCN-47 (dashboard của report-service).
+// Route nội bộ /internal/... — gateway chặn mọi đường dẫn chứa /internal/ nên chỉ service
+// trong mạng Docker gọi được, không có xác thực riêng (docs/api-contract.md mục 6).
 import { Router } from 'express';
+import * as InternalController from '../controllers/InternalController.js';
 
 const router = Router();
 
-export default router;// Khai báo route nội bộ /internal/... (gateway không công khai) và phân quyền
+router.get('/stats', InternalController.stats);
+router.get('/activity', InternalController.activity);
+
+export default router;

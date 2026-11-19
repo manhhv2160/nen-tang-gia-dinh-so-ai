@@ -72,9 +72,9 @@ TEST_DATABASE_URL=postgres://user:pass@localhost:5432/community_test npm test   
 ## Danh sách việc
 - [x] Model và bảng trong `db/init` (FMLCN-46)
 - [x] Repository, Service, Controller, Route (FMLCN-46)
-- [ ] Endpoint `/internal` (`/internal/stats`, `/internal/activity`) — thẻ FMLCN-47; `GET /health` đã có
+- [x] Endpoint `/internal` (`/internal/stats`, `/internal/activity`) — thẻ FMLCN-47; `GET /health` đã có
 - [x] Phân quyền theo header `X-User-Role` + membership của dòng họ (FMLCN-46)
-- [ ] Cập nhật bảng endpoint trong README này và docs/api-contract.md
+- [x] Cập nhật bảng endpoint trong README này và docs/api-contract.md
 
 ## Ghi chú phân quyền (FMLCN-46)
 - Mọi endpoint cần `FAMILY_MEMBER` trở lên (`shared/src/requireRole.js`).

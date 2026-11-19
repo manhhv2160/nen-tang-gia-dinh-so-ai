@@ -45,20 +45,3 @@ export async function remove(reactionId) {
     return result.rowCount > 0;
 }
 
-/** Số lượng cảm xúc theo loại: { LIKE: 3, LOVE: 1, ... } (dùng cho /internal/stats - thẻ FMLCN-47). */
-export async function countByType(familyId) {
-    const values = [];
-    let where = '';
-    if (familyId) {
-        values.push(familyId);
-        where = 'WHERE p.family_id = $1';
-    }
-    const result = await pool.query(
-        `SELECT r.reaction_type, COUNT(*)::int AS count
-         FROM reaction r JOIN post p ON p.post_id = r.post_id
-         ${where}
-         GROUP BY r.reaction_type`,
-        values,
-    );
-    return Object.fromEntries(result.rows.map((row) => [row.reaction_type, row.count]));
-}
