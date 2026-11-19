@@ -18,17 +18,16 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/reactions', reactionRoutes);
 app.use('/internal', internalRoutes);
 
-app.use((req, res, next) => next(new AppError(404, 'Route not found', { code: 'NOT_FOUND' })));
+app.use((req, res, next) => next(new AppError(404, 'NOT_FOUND', 'Route not found')));
 app.use((error, req, res, next) => {
     if (res.headersSent) return next(error);
     if (error.status === 400 && error.type === 'entity.parse.failed') {
-        return ApiResponse.error(res, 400, 'Validation failed', {
-            code: 'VALIDATION_ERROR',
-            fields: { body: 'must contain valid JSON' },
+        return ApiResponse.error(res, 400, 'VALIDATION_ERROR', 'Validation failed', {
+            body: 'must contain valid JSON',
         });
     }
     if (error.type === 'entity.too.large') {
-        return ApiResponse.error(res, 413, 'Payload too large', { code: 'PAYLOAD_TOO_LARGE' });
+        return ApiResponse.error(res, 413, 'PAYLOAD_TOO_LARGE', 'Payload too large');
     }
     return ApiResponse.fromError(res, error);
 });
