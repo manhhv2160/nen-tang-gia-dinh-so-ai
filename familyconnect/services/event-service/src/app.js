@@ -1,8 +1,17 @@
 import express from 'express';
 import { registerHealthRoute } from '../../../shared/src/healthRoute.js';
-
-const app = express();
-
-registerHealthRoute(app, 'event-service');
-
+import { userContext } from '../../../shared/src/userContext.js';
+import { missing,errorHandler } from './utils.js';
+import routes from './routes/event.routes.js';
+import internal from './routes/internal.routes.js';
+import rsvp from './routes/rsvp.routes.js';
+const app=express();
+app.use(express.json({limit:'1mb'}));
+app.use(userContext);
+registerHealthRoute(app,'event-service');
+app.use('/internal',internal);
+app.use('/api/events',routes);
+app.use('/api/rsvps',rsvp);
+app.use((req,res)=>missing());
+app.use(errorHandler);
 export default app;
