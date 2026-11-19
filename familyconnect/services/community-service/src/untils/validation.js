@@ -4,10 +4,7 @@ import { isValidEnum } from '../../../../shared/src/enums.js';
 const MAX_BIGINT = 9223372036854775807n;
 
 export const failValidation = (fields) => {
-    throw new AppError(400, 'Validation failed', {
-        code: 'VALIDATION_ERROR',
-        fields,
-    });
+    throw AppError.validation(fields);
 };
 
 export function parseId(value, field = 'id') {
