@@ -56,10 +56,10 @@ export async function callService(baseUrl, path, options = {}) {
       payload = await response.json();
     } catch (err) {
       if (err.name === 'AbortError') throw err;
-      throw AppError.badGateway(`Dịch vụ ${url.host} trả dữ liệu không phải JSON`);
+      throw AppError.serviceUnavailable(`Dịch vụ ${url.host} trả dữ liệu không phải JSON`); 
     }
     if (!isEnvelope(payload)) {
-      throw AppError.badGateway(`Dịch vụ ${url.host} trả sai định dạng response chung`);
+      throw AppError.serviceUnavailable(`Dịch vụ ${url.host} trả sai định dạng response chung`);
     }
     if (!payload.success) {
       const code = payload.status_code >= 500 ? 502 : payload.status_code;
@@ -71,7 +71,7 @@ export async function callService(baseUrl, path, options = {}) {
     if (err.name === 'AbortError') {
       throw AppError.gatewayTimeout(`Dịch vụ ${url.host} không phản hồi sau ${timeoutMs} ms`);
     }
-    throw AppError.badGateway(`Không gọi được dịch vụ ${url.host}`);
+      throw AppError.serviceUnavailable(`Không gọi được dịch vụ ${url.host}`);
   } finally {
     clearTimeout(timer);
   }
