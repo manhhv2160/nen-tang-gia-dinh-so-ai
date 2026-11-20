@@ -4,9 +4,9 @@
 
 CREATE TABLE IF NOT EXISTS audit_log (
     audit_id    BIGSERIAL PRIMARY KEY,
-    user_id     BIGINT,                          -- NULL nếu hệ thống tự thực hiện
-    action      VARCHAR(100) NOT NULL,           -- ví dụ: CREATE_POST, DELETE_MEMBER
-    entity_type VARCHAR(50)  NOT NULL,           -- ví dụ: POST, MEMBER, EVENT
+    user_id     BIGINT,                          
+    action      VARCHAR(100) NOT NULL,          
+    entity_type VARCHAR(50)  NOT NULL,         
     entity_id   BIGINT,
     family_id   BIGINT,
     created_at  TIMESTAMP    NOT NULL DEFAULT now()
