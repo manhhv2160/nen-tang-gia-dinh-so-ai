@@ -3,12 +3,13 @@
   "status_code": 200,
   "message": "OK",
   "data": {
-    "users_count": 5,
-    "family_count": 1,
-    "branch_count": 2,
-    "member_count": 5,
-    "post_count": 2,
-    "event_count": 2,
-    "heritage_count": 2
+    "generated_at": "2026-11-12T08:00:00.000Z",
+    "partial": false,
+    "unavailable_services": [],
+    "users": { "users_count": 5, "users_by_role": { "GUEST": 1, "FAMILY_MEMBER": 3, "FAMILY_ADMIN": 0, "SYSTEM_ADMIN": 1 } },
+    "genealogy": { "families_count": 1, "branches_count": 2, "members_count": 5, "verified_members_count": 4, "members_by_gender": { "MALE": 3, "FEMALE": 2, "OTHER": 0 }, "members_by_generation": { "1": 1, "2": 2, "3": 2 } },
+    "community": { "posts_count": 2, "comments_count": 3, "reactions_count": 4, "posts_by_type": { "NEWS": 1, "GENERAL": 1 } },
+    "events": { "events_count": 2, "upcoming_events_count": 2, "rsvps_by_status": { "ATTENDING": 2, "DECLINED": 0, "MAYBE": 1 } },
+    "heritage": { "heritage_count": 2, "heritage_by_type": { "STORY": 1, "DOCUMENT": 1 } }
   }
 }
