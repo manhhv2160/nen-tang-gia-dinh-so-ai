@@ -137,6 +137,7 @@ test('thiếu danh tính -> 401, vai trò GUEST -> 403', { skip }, async () => {
     const guest = await api('GET', '/api/posts?family_id=1', { headers: GUEST });
     assert.equal(guest.status, 403);
     assert.equal(guest.json.data.code, 'FORBIDDEN');
+});
     test('thành viên chưa xác minh (is_verified=false) -> 403', { skip }, async () => {
     const unverified = await api('GET', '/api/posts?family_id=1', {
         headers: { 'X-User-Id': '8', 'X-User-Role': 'FAMILY_MEMBER' },
