@@ -19,5 +19,6 @@ export async function assertFamilyAccess(user, familyId, minimumRole = Roles.FAM
     const memberships = await getMemberships(user.userId);
     const membership = memberships.find((item) => String(item.family_id) === String(familyId));
     if (!membership) throw forbidden('Bạn không thuộc dòng họ này');
+    if (!membership.is_verified) throw forbidden('Thành viên chưa được xác minh');
     return membership;
 }
