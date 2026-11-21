@@ -71,7 +71,11 @@ services:
       - db
       - report-service
 
+<<<<<<< HEAD
   community-service:
+=======
+     community-service:
+>>>>>>> e4c30108e9199acbf397af165e26641720ca9748
     build:
       context: .
       dockerfile: services/community-service/Dockerfile
@@ -80,9 +84,15 @@ services:
       DATABASE_URL: postgres://community_svc:community_dev_pw@db:5432/community_db
       GENEALOGY_URL: http://genealogy-service:3002
       REPORT_URL: http://report-service:3007
+<<<<<<< HEAD
       depends_on:
         - db
         - report-service
+=======
+    depends_on:
+      - db
+      - report-service
+>>>>>>> e4c30108e9199acbf397af165e26641720ca9748
 
   event-service:
     build:
