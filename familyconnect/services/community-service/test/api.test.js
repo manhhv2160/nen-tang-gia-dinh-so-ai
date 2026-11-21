@@ -21,6 +21,7 @@ const MEMBERSHIPS = {
     5: [{ family_id: '1', member_id: '1', is_verified: true }],
     6: [{ family_id: '1', member_id: '2', is_verified: true }],
     7: [{ family_id: '2', member_id: '3', is_verified: true }],
+    8: [{ family_id: '1', member_id: '4', is_verified: false }],
 };
 
 const AUTHOR = { 'X-User-Id': '5', 'X-User-Role': 'FAMILY_MEMBER' };
@@ -136,6 +137,12 @@ test('thiếu danh tính -> 401, vai trò GUEST -> 403', { skip }, async () => {
     const guest = await api('GET', '/api/posts?family_id=1', { headers: GUEST });
     assert.equal(guest.status, 403);
     assert.equal(guest.json.data.code, 'FORBIDDEN');
+    test('thành viên chưa xác minh (is_verified=false) -> 403', { skip }, async () => {
+    const unverified = await api('GET', '/api/posts?family_id=1', {
+        headers: { 'X-User-Id': '8', 'X-User-Role': 'FAMILY_MEMBER' },
+    });
+    assert.equal(unverified.status, 403, 'thành viên chưa xác minh phải bị chặn');
+    assert.equal(unverified.json.data.code, 'FORBIDDEN');
 });
 
 test('GET /api/posts: bắt buộc family_id, chặn dòng họ không thuộc', { skip }, async () => {
