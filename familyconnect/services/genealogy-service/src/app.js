@@ -1,4 +1,5 @@
 import express from 'express';
+import { AppError } from '../../../shared/src/AppError.js';
 import { ApiResponse } from '../../../shared/src/ApiResponse.js';
 import { userContext } from '../../../shared/src/userContext.js';
 import { registerHealthRoute } from '../../../shared/src/healthRoute.js';
@@ -30,19 +31,13 @@ app.use((error, req, res, next) => {
     if (res.headersSent) return next(error);
     if (error.code === '23505') return ApiResponse.fromError(res, conflict());
     if (error.code === '23503') {
-        return ApiResponse.error(res, 400, 'Validation failed', {
-            code: 'VALIDATION_ERROR',
-            fields: {},
-        });
+        return ApiResponse.fromError(res, AppError.validation({}));
     }
     if (error.status === 400 && error.type === 'entity.parse.failed') {
-        return ApiResponse.error(res, 400, 'Validation failed', {
-            code: 'VALIDATION_ERROR',
-            fields: { body: 'must contain valid JSON' },
-        });
+        return ApiResponse.fromError(res, AppError.validation({ body: 'must contain valid JSON' }));
     }
     if (error.type === 'entity.too.large') {
-        return ApiResponse.error(res, 413, 'Payload too large', { code: 'PAYLOAD_TOO_LARGE' });
+        return ApiResponse.fromError(res, AppError.payloadTooLarge());
     }
     return ApiResponse.fromError(res, error);
 });

@@ -17,7 +17,7 @@ export function requireRole(minRole) {
     const user = getUserContext(req);
     req.user = user;
     if (user.role === Roles.SYSTEM_ADMIN || roleAtLeast(user.role, minRole)) return next();
-    const err = user.userId ? AppError.forbidden() : AppError.unauthorized();
+    const err = user.userId ? AppError.forbidden() : AppError.unauthenticated();
     return ApiResponse.fromError(res, err);
   };
 }

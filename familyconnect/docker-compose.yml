@@ -79,8 +79,10 @@ services:
       PORT: 3003
       DATABASE_URL: postgres://community_svc:community_dev_pw@db:5432/community_db
       GENEALOGY_URL: http://genealogy-service:3002
+      REPORT_URL: http://report-service:3007
     depends_on:
       - db
+      - report-service
 
   event-service:
     build:
